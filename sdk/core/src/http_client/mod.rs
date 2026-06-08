@@ -1,11 +1,11 @@
-#[cfg(not(any(feature = "enable_reqwest", feature = "enable_reqwest_rustls")))]
+#[cfg(not(feature = "enable_reqwest"))]
 mod noop;
-#[cfg(any(feature = "enable_reqwest", feature = "enable_reqwest_rustls"))]
+#[cfg(feature = "enable_reqwest")]
 mod reqwest;
 
-#[cfg(not(any(feature = "enable_reqwest", feature = "enable_reqwest_rustls")))]
+#[cfg(not(feature = "enable_reqwest"))]
 use self::noop::new_noop_client;
-#[cfg(any(feature = "enable_reqwest", feature = "enable_reqwest_rustls"))]
+#[cfg(feature = "enable_reqwest")]
 use self::reqwest::new_reqwest_client;
 use crate::error::ErrorKind;
 use async_trait::async_trait;
@@ -15,11 +15,11 @@ use std::sync::Arc;
 
 /// Construct a new `HttpClient`
 pub fn new_http_client() -> Arc<dyn HttpClient> {
-    #[cfg(any(feature = "enable_reqwest", feature = "enable_reqwest_rustls"))]
+    #[cfg(feature = "enable_reqwest")]
     {
         new_reqwest_client()
     }
-    #[cfg(not(any(feature = "enable_reqwest", feature = "enable_reqwest_rustls")))]
+    #[cfg(not(feature = "enable_reqwest"))]
     {
         new_noop_client()
     }

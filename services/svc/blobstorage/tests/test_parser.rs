@@ -14,6 +14,9 @@ fn parse_list_container_segment() -> Result<()> {
         .into_iter()
         .map(|x| x.name)
         .collect::<Vec<_>>();
-    assert_eq!(containers, ["backup", "test1", "test2", "test3", "test4", "test5"]);
+    assert_eq!(
+        containers,
+        ["backup", "test1", "test2", "test3", "test4", "test5"]
+    );
     Ok(())
 }

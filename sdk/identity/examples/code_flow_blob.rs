@@ -59,7 +59,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("x-ms-date ==> {time}");
 
     let resp = reqwest::Client::new()
-        .get(&format!(
+        .get(format!(
             "https://{storage_account_name}.blob.core.windows.net/{container_name}?restype=container&comp=list"
         ))
         .header(

@@ -14,14 +14,23 @@ use futures::stream::StreamExt;
 async fn main() -> azure_core::Result<()> {
     env_logger::init();
 
-    let account_name = std::env::args().nth(1).expect("please specify storage account");
+    let account_name = std::env::args()
+        .nth(1)
+        .expect("please specify storage account");
 
     let endpoint = Url::parse(&format!("https://{account_name}.blob.core.windows.net"))?;
     let scopes = &["https://storage.azure.com/.default"];
     let credential = azure_identity::create_credential()?;
-    let client = Client::builder(credential).endpoint(endpoint).scopes(scopes).build()?;
+    let client = Client::builder(credential)
+        .endpoint(endpoint)
+        .scopes(scopes)
+        .build()?;
 
-    let mut pages = client.service_client().list_containers_segment().maxresults(1).into_stream();
+    let mut pages = client
+        .service_client()
+        .list_containers_segment()
+        .maxresults(1)
+        .into_stream();
     while let Some(page) = pages.next().await {
         let page = page?;
         if let Some(containers) = page.containers {

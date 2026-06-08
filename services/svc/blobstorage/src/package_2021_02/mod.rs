@@ -59,7 +59,9 @@ impl ClientBuilder {
         let scopes = if let Some(scopes) = self.scopes {
             scopes
         } else {
-            vec![endpoint.join(azure_core::auth::DEFAULT_SCOPE_SUFFIX)?.to_string()]
+            vec![endpoint
+                .join(azure_core::auth::DEFAULT_SCOPE_SUFFIX)?
+                .to_string()]
         };
         Ok(Client::new(endpoint, self.credential, scopes, self.options))
     }
@@ -79,13 +81,18 @@ impl Client {
     pub(crate) fn scopes(&self) -> Vec<&str> {
         self.scopes.iter().map(String::as_str).collect()
     }
-    pub(crate) async fn send(&self, request: &mut azure_core::Request) -> azure_core::Result<azure_core::Response> {
+    pub(crate) async fn send(
+        &self,
+        request: &mut azure_core::Request,
+    ) -> azure_core::Result<azure_core::Response> {
         let context = azure_core::Context::default();
         self.pipeline.send(&context, request).await
     }
     #[doc = "Create a new `ClientBuilder`."]
     #[must_use]
-    pub fn builder(credential: std::sync::Arc<dyn azure_core::auth::TokenCredential>) -> ClientBuilder {
+    pub fn builder(
+        credential: std::sync::Arc<dyn azure_core::auth::TokenCredential>,
+    ) -> ClientBuilder {
         ClientBuilder::new(credential)
     }
     #[doc = "Create a new `Client`."]
@@ -185,7 +192,10 @@ pub mod service {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `key_info`: Key information"]
-        pub fn get_user_delegation_key(&self, key_info: impl Into<models::KeyInfo>) -> get_user_delegation_key::RequestBuilder {
+        pub fn get_user_delegation_key(
+            &self,
+            key_info: impl Into<models::KeyInfo>,
+        ) -> get_user_delegation_key::RequestBuilder {
             get_user_delegation_key::RequestBuilder {
                 client: self.0.clone(),
                 key_info: key_info.into(),
@@ -195,7 +205,9 @@ pub mod service {
         }
         #[doc = "Returns the sku name and account kind "]
         pub fn get_account_info(&self) -> get_account_info::RequestBuilder {
-            get_account_info::RequestBuilder { client: self.0.clone() }
+            get_account_info::RequestBuilder {
+                client: self.0.clone(),
+            }
         }
         #[doc = "The Batch operation allows multiple API calls to be embedded into a single HTTP request."]
         #[doc = ""]
@@ -250,7 +262,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -269,15 +281,23 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -311,7 +331,10 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -326,10 +349,15 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -348,7 +376,8 @@ pub mod service {
         }
         impl std::future::IntoFuture for RequestBuilder {
             type Output = azure_core::Result<models::StorageServiceProperties>;
-            type IntoFuture = BoxFuture<'static, azure_core::Result<models::StorageServiceProperties>>;
+            type IntoFuture =
+                BoxFuture<'static, azure_core::Result<models::StorageServiceProperties>>;
             #[doc = "Returns a future that sends the request and returns the parsed response body."]
             #[doc = ""]
             #[doc = "You should not normally call this method directly, simply invoke `.await` which implicitly calls `IntoFuture::into_future`."]
@@ -374,7 +403,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -393,15 +422,23 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -436,7 +473,10 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -451,12 +491,17 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("content-type", "application/xml");
                         let req_body = azure_core::xml::to_xml(&this.storage_service_properties)?;
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -493,7 +538,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -512,19 +557,30 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -558,7 +614,10 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -573,10 +632,15 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -615,9 +679,12 @@ pub mod service {
         #[derive(Debug)]
         pub struct Response(azure_core::Response);
         impl Response {
-            pub async fn into_body(self) -> azure_core::Result<models::ListContainersSegmentResponse> {
+            pub async fn into_body(
+                self,
+            ) -> azure_core::Result<models::ListContainersSegmentResponse> {
                 let bytes = self.0.into_body().collect().await?;
-                let body: models::ListContainersSegmentResponse = azure_core::xml::read_xml(&bytes)?;
+                let body: models::ListContainersSegmentResponse =
+                    azure_core::xml::read_xml(&bytes)?;
                 Ok(body)
             }
             pub fn into_raw_response(self) -> azure_core::Response {
@@ -626,7 +693,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -645,15 +712,23 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -711,30 +786,47 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
-            pub fn into_stream(self) -> azure_core::Pageable<models::ListContainersSegmentResponse, azure_core::error::Error> {
+            pub fn into_stream(
+                self,
+            ) -> azure_core::Pageable<models::ListContainersSegmentResponse, azure_core::error::Error>
+            {
                 let make_request = move |continuation: Option<String>| {
                     let this = self.clone();
                     async move {
                         let mut url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(prefix) = &this.prefix {
-                            req.url_mut().query_pairs_mut().append_pair("prefix", prefix);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("prefix", prefix);
                         }
                         if let Some(marker) = &this.marker {
-                            req.url_mut().query_pairs_mut().append_pair("marker", marker);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("marker", marker);
                         }
                         if let Some(maxresults) = &this.maxresults {
-                            req.url_mut().query_pairs_mut().append_pair("maxresults", &maxresults.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("maxresults", &maxresults.to_string());
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -747,10 +839,12 @@ pub mod service {
                         let rsp = this.client.send(&mut req).await?;
                         let rsp = match rsp.status() {
                             azure_core::StatusCode::Ok => Ok(Response(rsp)),
-                            status_code => Err(azure_core::error::Error::from(azure_core::error::ErrorKind::HttpResponse {
-                                status: status_code,
-                                error_code: None,
-                            })),
+                            status_code => Err(azure_core::error::Error::from(
+                                azure_core::error::ErrorKind::HttpResponse {
+                                    status: status_code,
+                                    error_code: None,
+                                },
+                            )),
                         };
                         rsp?.into_body().await
                     }
@@ -784,7 +878,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -803,19 +897,30 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -850,7 +955,10 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -865,12 +973,17 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Post);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("content-type", "application/xml");
                         let req_body = azure_core::xml::to_xml(&this.key_info)?;
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -914,7 +1027,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -933,31 +1046,50 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "Identifies the sku name of the account"]
             pub fn x_ms_sku_name(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-sku-name"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-sku-name",
+                    ))
             }
             #[doc = "Identifies the account kind"]
             pub fn x_ms_account_kind(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-account-kind"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-account-kind",
+                    ))
             }
             #[doc = "Version 2019-07-07 and newer. Indicates if the account has a hierarchical namespace enabled."]
             pub fn x_ms_is_hns_enabled(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-is-hns-enabled"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-is-hns-enabled",
+                ))
             }
         }
         #[derive(Clone)]
@@ -994,7 +1126,10 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -1029,7 +1164,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -1047,15 +1182,24 @@ pub mod service {
         impl<'a> Headers<'a> {
             #[doc = "The media type of the body of the response. For batch requests, this is multipart/mixed; boundary=batchresponse_GUID"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -1092,7 +1236,10 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -1107,13 +1254,18 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Post);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = azure_core::to_json(&this.body)?;
                         req.insert_header("content-length", this.content_length.to_string());
                         req.insert_header("content-type", &this.content_type);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -1162,7 +1314,7 @@ pub mod service {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -1181,19 +1333,30 @@ pub mod service {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -1230,7 +1393,10 @@ pub mod service {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -1260,10 +1426,15 @@ pub mod service {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -1272,10 +1443,14 @@ pub mod service {
                             req.url_mut().query_pairs_mut().append_pair("where", where_);
                         }
                         if let Some(marker) = &this.marker {
-                            req.url_mut().query_pairs_mut().append_pair("marker", marker);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("marker", marker);
                         }
                         if let Some(maxresults) = &this.maxresults {
-                            req.url_mut().query_pairs_mut().append_pair("maxresults", &maxresults.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("maxresults", &maxresults.to_string());
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -1315,7 +1490,10 @@ pub mod container {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
-        pub fn get_properties(&self, container_name: impl Into<String>) -> get_properties::RequestBuilder {
+        pub fn get_properties(
+            &self,
+            container_name: impl Into<String>,
+        ) -> get_properties::RequestBuilder {
             get_properties::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1359,7 +1537,10 @@ pub mod container {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
-        pub fn set_metadata(&self, container_name: impl Into<String>) -> set_metadata::RequestBuilder {
+        pub fn set_metadata(
+            &self,
+            container_name: impl Into<String>,
+        ) -> set_metadata::RequestBuilder {
             set_metadata::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1374,7 +1555,10 @@ pub mod container {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
-        pub fn get_access_policy(&self, container_name: impl Into<String>) -> get_access_policy::RequestBuilder {
+        pub fn get_access_policy(
+            &self,
+            container_name: impl Into<String>,
+        ) -> get_access_policy::RequestBuilder {
             get_access_policy::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1387,7 +1571,10 @@ pub mod container {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
-        pub fn set_access_policy(&self, container_name: impl Into<String>) -> set_access_policy::RequestBuilder {
+        pub fn set_access_policy(
+            &self,
+            container_name: impl Into<String>,
+        ) -> set_access_policy::RequestBuilder {
             set_access_policy::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1419,7 +1606,11 @@ pub mod container {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `x_ms_source_container_name`: Required.  Specifies the name of the container to rename."]
-        pub fn rename(&self, container_name: impl Into<String>, x_ms_source_container_name: impl Into<String>) -> rename::RequestBuilder {
+        pub fn rename(
+            &self,
+            container_name: impl Into<String>,
+            x_ms_source_container_name: impl Into<String>,
+        ) -> rename::RequestBuilder {
             rename::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1526,7 +1717,11 @@ pub mod container {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `x_ms_lease_action`: Describes what lease action to take."]
-        pub fn break_lease(&self, container_name: impl Into<String>, x_ms_lease_action: impl Into<String>) -> break_lease::RequestBuilder {
+        pub fn break_lease(
+            &self,
+            container_name: impl Into<String>,
+            x_ms_lease_action: impl Into<String>,
+        ) -> break_lease::RequestBuilder {
             break_lease::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1568,7 +1763,10 @@ pub mod container {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
-        pub fn list_blob_flat_segment(&self, container_name: impl Into<String>) -> list_blob_flat_segment::RequestBuilder {
+        pub fn list_blob_flat_segment(
+            &self,
+            container_name: impl Into<String>,
+        ) -> list_blob_flat_segment::RequestBuilder {
             list_blob_flat_segment::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1606,7 +1804,10 @@ pub mod container {
         #[doc = ""]
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
-        pub fn get_account_info(&self, container_name: impl Into<String>) -> get_account_info::RequestBuilder {
+        pub fn get_account_info(
+            &self,
+            container_name: impl Into<String>,
+        ) -> get_account_info::RequestBuilder {
             get_account_info::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -1628,7 +1829,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -1645,71 +1846,105 @@ pub mod container {
         pub struct Headers<'a>(&'a azure_core::headers::Headers);
         impl<'a> Headers<'a> {
             pub fn x_ms_meta(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "When a blob is leased, specifies whether the lease is of infinite or fixed duration."]
             pub fn x_ms_lease_duration(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-duration"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-duration",
+                    ))
             }
             #[doc = "Lease state of the blob."]
             pub fn x_ms_lease_state(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-state"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-state",
+                    ))
             }
             #[doc = "The current lease status of the blob."]
             pub fn x_ms_lease_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-status",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "Indicated whether data in the container may be accessed publicly and the level of access"]
             pub fn x_ms_blob_public_access(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-public-access"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-public-access",
+                    ))
             }
             #[doc = "Indicates whether the container has an immutability policy set on it."]
             pub fn x_ms_has_immutability_policy(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-has-immutability-policy"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-has-immutability-policy",
+                ))
             }
             #[doc = "Indicates whether the container has a legal hold."]
             pub fn x_ms_has_legal_hold(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-has-legal-hold"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-has-legal-hold",
+                ))
             }
             #[doc = "The default encryption scope for the container."]
             pub fn x_ms_default_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-default-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-default-encryption-scope",
+                    ))
             }
             #[doc = "Indicates whether the container's default encryption scope can be overriden."]
             pub fn x_ms_deny_encryption_scope_override(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-deny-encryption-scope-override"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-deny-encryption-scope-override",
+                ))
             }
             #[doc = "Indicates whether version level worm is enabled on a container."]
-            pub fn x_ms_immutable_storage_with_versioning_enabled(&self) -> azure_core::Result<bool> {
+            pub fn x_ms_immutable_storage_with_versioning_enabled(
+                &self,
+            ) -> azure_core::Result<bool> {
                 self.0.get_as(&azure_core::headers::HeaderName::from_static(
                     "x-ms-immutable-storage-with-versioning-enabled",
                 ))
@@ -1753,7 +1988,10 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -1768,10 +2006,15 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -1807,7 +2050,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -1825,28 +2068,42 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -1890,23 +2147,36 @@ pub mod container {
                 self
             }
             #[doc = "Specifies whether data in the container may be accessed publicly and the level of access"]
-            pub fn x_ms_blob_public_access(mut self, x_ms_blob_public_access: impl Into<String>) -> Self {
+            pub fn x_ms_blob_public_access(
+                mut self,
+                x_ms_blob_public_access: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_public_access = Some(x_ms_blob_public_access.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Optional.  Version 2019-07-07 and later.  Specifies the default encryption scope to set on the container and use for all future writes."]
-            pub fn x_ms_default_encryption_scope(mut self, x_ms_default_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_default_encryption_scope(
+                mut self,
+                x_ms_default_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_default_encryption_scope = Some(x_ms_default_encryption_scope.into());
                 self
             }
             #[doc = "Optional.  Version 2019-07-07 and newer.  If true, prevents any request from specifying a different encryption scope than the scope set on the container."]
-            pub fn x_ms_deny_encryption_scope_override(mut self, x_ms_deny_encryption_scope_override: bool) -> Self {
-                self.x_ms_deny_encryption_scope_override = Some(x_ms_deny_encryption_scope_override);
+            pub fn x_ms_deny_encryption_scope_override(
+                mut self,
+                x_ms_deny_encryption_scope_override: bool,
+            ) -> Self {
+                self.x_ms_deny_encryption_scope_override =
+                    Some(x_ms_deny_encryption_scope_override);
                 self
             }
             #[doc = "Returns a future that sends the request and returns a [`Response`] object that provides low-level access to full response details."]
@@ -1920,10 +2190,15 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_meta) = &this.x_ms_meta {
                             req.insert_header("x-ms-meta", x_ms_meta);
@@ -1934,10 +2209,17 @@ pub mod container {
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
-                        if let Some(x_ms_default_encryption_scope) = &this.x_ms_default_encryption_scope {
-                            req.insert_header("x-ms-default-encryption-scope", x_ms_default_encryption_scope);
+                        if let Some(x_ms_default_encryption_scope) =
+                            &this.x_ms_default_encryption_scope
+                        {
+                            req.insert_header(
+                                "x-ms-default-encryption-scope",
+                                x_ms_default_encryption_scope,
+                            );
                         }
-                        if let Some(x_ms_deny_encryption_scope_override) = &this.x_ms_deny_encryption_scope_override {
+                        if let Some(x_ms_deny_encryption_scope_override) =
+                            &this.x_ms_deny_encryption_scope_override
+                        {
                             req.insert_header(
                                 "x-ms-deny-encryption-scope-override",
                                 x_ms_deny_encryption_scope_override.to_string(),
@@ -1971,7 +2253,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -1990,19 +2272,30 @@ pub mod container {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -2045,17 +2338,26 @@ pub mod container {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -2070,10 +2372,15 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Delete);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -2082,7 +2389,10 @@ pub mod container {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -2115,7 +2425,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -2133,28 +2443,42 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -2202,12 +2526,18 @@ pub mod container {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -2222,10 +2552,15 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -2247,7 +2582,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=metadata", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=metadata",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -2272,7 +2610,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -2291,32 +2629,48 @@ pub mod container {
             #[doc = "Indicated whether data in the container may be accessed publicly and the level of access"]
             pub fn x_ms_blob_public_access(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-public-access"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-public-access",
+                    ))
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -2357,7 +2711,10 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -2372,10 +2729,15 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -2391,7 +2753,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=acl", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=acl",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -2423,7 +2788,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -2441,28 +2806,42 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -2497,7 +2876,10 @@ pub mod container {
         }
         impl RequestBuilder {
             #[doc = "the acls for the container"]
-            pub fn container_acl(mut self, container_acl: impl Into<models::SignedIdentifiers>) -> Self {
+            pub fn container_acl(
+                mut self,
+                container_acl: impl Into<models::SignedIdentifiers>,
+            ) -> Self {
                 self.container_acl = Some(container_acl.into());
                 self
             }
@@ -2512,22 +2894,34 @@ pub mod container {
                 self
             }
             #[doc = "Specifies whether data in the container may be accessed publicly and the level of access"]
-            pub fn x_ms_blob_public_access(mut self, x_ms_blob_public_access: impl Into<String>) -> Self {
+            pub fn x_ms_blob_public_access(
+                mut self,
+                x_ms_blob_public_access: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_public_access = Some(x_ms_blob_public_access.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -2542,7 +2936,10 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = if let Some(container_acl) = &this.container_acl {
                             req.insert_header("content-type", "application/xml");
@@ -2551,7 +2948,9 @@ pub mod container {
                             azure_core::EMPTY_BODY
                         };
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -2563,7 +2962,10 @@ pub mod container {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -2575,7 +2977,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=acl", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=acl",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -2595,7 +3000,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -2614,19 +3019,30 @@ pub mod container {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -2663,17 +3079,26 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Optional.  Version 2019-12-12 and later.  Specifies the name of the deleted container to restore."]
-            pub fn x_ms_deleted_container_name(mut self, x_ms_deleted_container_name: impl Into<String>) -> Self {
+            pub fn x_ms_deleted_container_name(
+                mut self,
+                x_ms_deleted_container_name: impl Into<String>,
+            ) -> Self {
                 self.x_ms_deleted_container_name = Some(x_ms_deleted_container_name.into());
                 self
             }
             #[doc = "Optional.  Version 2019-12-12 and later.  Specifies the version of the deleted container to restore."]
-            pub fn x_ms_deleted_container_version(mut self, x_ms_deleted_container_version: impl Into<String>) -> Self {
+            pub fn x_ms_deleted_container_version(
+                mut self,
+                x_ms_deleted_container_version: impl Into<String>,
+            ) -> Self {
                 self.x_ms_deleted_container_version = Some(x_ms_deleted_container_version.into());
                 self
             }
@@ -2688,19 +3113,33 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
-                        if let Some(x_ms_deleted_container_name) = &this.x_ms_deleted_container_name {
-                            req.insert_header("x-ms-deleted-container-name", x_ms_deleted_container_name);
+                        if let Some(x_ms_deleted_container_name) = &this.x_ms_deleted_container_name
+                        {
+                            req.insert_header(
+                                "x-ms-deleted-container-name",
+                                x_ms_deleted_container_name,
+                            );
                         }
-                        if let Some(x_ms_deleted_container_version) = &this.x_ms_deleted_container_version {
-                            req.insert_header("x-ms-deleted-container-version", x_ms_deleted_container_version);
+                        if let Some(x_ms_deleted_container_version) =
+                            &this.x_ms_deleted_container_version
+                        {
+                            req.insert_header(
+                                "x-ms-deleted-container-version",
+                                x_ms_deleted_container_version,
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -2710,7 +3149,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=undelete", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=undelete",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -2730,7 +3172,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -2749,19 +3191,30 @@ pub mod container {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -2798,7 +3251,10 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -2818,15 +3274,23 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
-                        req.insert_header("x-ms-source-container-name", &this.x_ms_source_container_name);
+                        req.insert_header(
+                            "x-ms-source-container-name",
+                            &this.x_ms_source_container_name,
+                        );
                         if let Some(x_ms_source_lease_id) = &this.x_ms_source_lease_id {
                             req.insert_header("x-ms-source-lease-id", x_ms_source_lease_id);
                         }
@@ -2838,7 +3302,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=rename", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=rename",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -2863,7 +3330,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -2881,15 +3348,24 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The media type of the body of the response. For batch requests, this is multipart/mixed; boundary=batchresponse_GUID"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -2927,7 +3403,10 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -2942,13 +3421,18 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Post);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = azure_core::to_json(&this.body)?;
                         req.insert_header("content-length", this.content_length.to_string());
                         req.insert_header("content-type", &this.content_type);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -2960,7 +3444,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=batch", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=batch",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -2992,7 +3479,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3010,32 +3497,49 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Uniquely identifies a container's lease"]
             pub fn x_ms_lease_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-id",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -3080,22 +3584,34 @@ pub mod container {
                 self
             }
             #[doc = "Proposed lease ID, in a GUID string format. The Blob service returns 400 (Invalid request) if the proposed lease ID is not in the correct format. See Guid Constructor (String) for a list of valid GUID string formats."]
-            pub fn x_ms_proposed_lease_id(mut self, x_ms_proposed_lease_id: impl Into<String>) -> Self {
+            pub fn x_ms_proposed_lease_id(
+                mut self,
+                x_ms_proposed_lease_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_proposed_lease_id = Some(x_ms_proposed_lease_id.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -3110,14 +3626,22 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_duration) = &this.x_ms_lease_duration {
-                            req.insert_header("x-ms-lease-duration", x_ms_lease_duration.to_string());
+                            req.insert_header(
+                                "x-ms-lease-duration",
+                                x_ms_lease_duration.to_string(),
+                            );
                         }
                         if let Some(x_ms_proposed_lease_id) = &this.x_ms_proposed_lease_id {
                             req.insert_header("x-ms-proposed-lease-id", x_ms_proposed_lease_id);
@@ -3126,7 +3650,10 @@ pub mod container {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -3139,7 +3666,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?comp=lease&restype=container&acquire", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?comp=lease&restype=container&acquire",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -3159,7 +3689,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3177,28 +3707,42 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -3237,17 +3781,26 @@ pub mod container {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -3262,18 +3815,26 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-lease-id", &this.x_ms_lease_id);
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -3286,7 +3847,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?comp=lease&restype=container&release", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?comp=lease&restype=container&release",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -3306,7 +3870,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3324,32 +3888,49 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Uniquely identifies a container's lease"]
             pub fn x_ms_lease_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-id",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -3388,17 +3969,26 @@ pub mod container {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -3413,18 +4003,26 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-lease-id", &this.x_ms_lease_id);
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -3437,7 +4035,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?comp=lease&restype=container&renew", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?comp=lease&restype=container&renew",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -3457,7 +4058,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3475,32 +4076,48 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Approximate time remaining in the lease period, in seconds."]
             pub fn x_ms_lease_time(&self) -> azure_core::Result<i32> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-lease-time"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-lease-time",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -3544,17 +4161,26 @@ pub mod container {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -3569,20 +4195,31 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_break_period) = &this.x_ms_lease_break_period {
-                            req.insert_header("x-ms-lease-break-period", x_ms_lease_break_period.to_string());
+                            req.insert_header(
+                                "x-ms-lease-break-period",
+                                x_ms_lease_break_period.to_string(),
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -3595,7 +4232,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?comp=lease&restype=container&break", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?comp=lease&restype=container&break",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -3615,7 +4255,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3633,32 +4273,49 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Uniquely identifies a container's lease"]
             pub fn x_ms_lease_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-id",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -3698,17 +4355,26 @@ pub mod container {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -3723,11 +4389,16 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-lease-id", &this.x_ms_lease_id);
                         req.insert_header("x-ms-proposed-lease-id", &this.x_ms_proposed_lease_id);
@@ -3735,7 +4406,10 @@ pub mod container {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -3748,7 +4422,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?comp=lease&restype=container&change", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?comp=lease&restype=container&change",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -3762,7 +4439,9 @@ pub mod container {
         #[derive(Debug)]
         pub struct Response(azure_core::Response);
         impl Response {
-            pub async fn into_body(self) -> azure_core::Result<models::ListBlobsFlatSegmentResponse> {
+            pub async fn into_body(
+                self,
+            ) -> azure_core::Result<models::ListBlobsFlatSegmentResponse> {
                 let bytes = self.0.into_body().collect().await?;
                 let body: models::ListBlobsFlatSegmentResponse = azure_core::xml::read_xml(&bytes)?;
                 Ok(body)
@@ -3773,7 +4452,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3791,24 +4470,38 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The media type of the body of the response. For List Blobs this is 'application/xml'"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -3867,30 +4560,47 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
-            pub fn into_stream(self) -> azure_core::Pageable<models::ListBlobsFlatSegmentResponse, azure_core::error::Error> {
+            pub fn into_stream(
+                self,
+            ) -> azure_core::Pageable<models::ListBlobsFlatSegmentResponse, azure_core::error::Error>
+            {
                 let make_request = move |continuation: Option<String>| {
                     let this = self.clone();
                     async move {
                         let mut url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(prefix) = &this.prefix {
-                            req.url_mut().query_pairs_mut().append_pair("prefix", prefix);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("prefix", prefix);
                         }
                         if let Some(marker) = &this.marker {
-                            req.url_mut().query_pairs_mut().append_pair("marker", marker);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("marker", marker);
                         }
                         if let Some(maxresults) = &this.maxresults {
-                            req.url_mut().query_pairs_mut().append_pair("maxresults", &maxresults.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("maxresults", &maxresults.to_string());
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -3903,10 +4613,12 @@ pub mod container {
                         let rsp = this.client.send(&mut req).await?;
                         let rsp = match rsp.status() {
                             azure_core::StatusCode::Ok => Ok(Response(rsp)),
-                            status_code => Err(azure_core::error::Error::from(azure_core::error::ErrorKind::HttpResponse {
-                                status: status_code,
-                                error_code: None,
-                            })),
+                            status_code => Err(azure_core::error::Error::from(
+                                azure_core::error::ErrorKind::HttpResponse {
+                                    status: status_code,
+                                    error_code: None,
+                                },
+                            )),
                         };
                         rsp?.into_body().await
                     }
@@ -3915,7 +4627,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=list&flat", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=list&flat",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -3929,9 +4644,12 @@ pub mod container {
         #[derive(Debug)]
         pub struct Response(azure_core::Response);
         impl Response {
-            pub async fn into_body(self) -> azure_core::Result<models::ListBlobsHierarchySegmentResponse> {
+            pub async fn into_body(
+                self,
+            ) -> azure_core::Result<models::ListBlobsHierarchySegmentResponse> {
                 let bytes = self.0.into_body().collect().await?;
-                let body: models::ListBlobsHierarchySegmentResponse = azure_core::xml::read_xml(&bytes)?;
+                let body: models::ListBlobsHierarchySegmentResponse =
+                    azure_core::xml::read_xml(&bytes)?;
                 Ok(body)
             }
             pub fn into_raw_response(self) -> azure_core::Response {
@@ -3940,7 +4658,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -3958,24 +4676,38 @@ pub mod container {
         impl<'a> Headers<'a> {
             #[doc = "The media type of the body of the response. For List Blobs this is 'application/xml'"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -4035,32 +4767,53 @@ pub mod container {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
-            pub fn into_stream(self) -> azure_core::Pageable<models::ListBlobsHierarchySegmentResponse, azure_core::error::Error> {
+            pub fn into_stream(
+                self,
+            ) -> azure_core::Pageable<
+                models::ListBlobsHierarchySegmentResponse,
+                azure_core::error::Error,
+            > {
                 let make_request = move |continuation: Option<String>| {
                     let this = self.clone();
                     async move {
                         let mut url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(prefix) = &this.prefix {
-                            req.url_mut().query_pairs_mut().append_pair("prefix", prefix);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("prefix", prefix);
                         }
                         let delimiter = &this.delimiter;
-                        req.url_mut().query_pairs_mut().append_pair("delimiter", delimiter);
+                        req.url_mut()
+                            .query_pairs_mut()
+                            .append_pair("delimiter", delimiter);
                         if let Some(marker) = &this.marker {
-                            req.url_mut().query_pairs_mut().append_pair("marker", marker);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("marker", marker);
                         }
                         if let Some(maxresults) = &this.maxresults {
-                            req.url_mut().query_pairs_mut().append_pair("maxresults", &maxresults.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("maxresults", &maxresults.to_string());
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -4073,10 +4826,12 @@ pub mod container {
                         let rsp = this.client.send(&mut req).await?;
                         let rsp = match rsp.status() {
                             azure_core::StatusCode::Ok => Ok(Response(rsp)),
-                            status_code => Err(azure_core::error::Error::from(azure_core::error::ErrorKind::HttpResponse {
-                                status: status_code,
-                                error_code: None,
-                            })),
+                            status_code => Err(azure_core::error::Error::from(
+                                azure_core::error::ErrorKind::HttpResponse {
+                                    status: status_code,
+                                    error_code: None,
+                                },
+                            )),
                         };
                         rsp?.into_body().await
                     }
@@ -4085,7 +4840,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=container&comp=list&hierarchy", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=container&comp=list&hierarchy",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -4105,7 +4863,7 @@ pub mod container {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -4124,27 +4882,44 @@ pub mod container {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "Identifies the sku name of the account"]
             pub fn x_ms_sku_name(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-sku-name"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-sku-name",
+                    ))
             }
             #[doc = "Identifies the account kind"]
             pub fn x_ms_account_kind(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-account-kind"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-account-kind",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -4182,7 +4957,10 @@ pub mod container {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -4192,7 +4970,10 @@ pub mod container {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}?restype=account&comp=properties", &self.container_name));
+                url.set_path(&format!(
+                    "/{}?restype=account&comp=properties",
+                    &self.container_name
+                ));
                 Ok(url)
             }
         }
@@ -4211,7 +4992,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn download(&self, container_name: impl Into<String>, blob: impl Into<String>) -> download::RequestBuilder {
+        pub fn download(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> download::RequestBuilder {
             download::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4239,7 +5024,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn delete(&self, container_name: impl Into<String>, blob: impl Into<String>) -> delete::RequestBuilder {
+        pub fn delete(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> delete::RequestBuilder {
             delete::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4263,7 +5052,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn get_properties(&self, container_name: impl Into<String>, blob: impl Into<String>) -> get_properties::RequestBuilder {
+        pub fn get_properties(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> get_properties::RequestBuilder {
             get_properties::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4288,7 +5081,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn undelete(&self, container_name: impl Into<String>, blob: impl Into<String>) -> undelete::RequestBuilder {
+        pub fn undelete(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> undelete::RequestBuilder {
             undelete::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4324,7 +5121,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn set_http_headers(&self, container_name: impl Into<String>, blob: impl Into<String>) -> set_http_headers::RequestBuilder {
+        pub fn set_http_headers(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> set_http_headers::RequestBuilder {
             set_http_headers::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4410,7 +5211,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn set_metadata(&self, container_name: impl Into<String>, blob: impl Into<String>) -> set_metadata::RequestBuilder {
+        pub fn set_metadata(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> set_metadata::RequestBuilder {
             set_metadata::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4580,7 +5385,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn create_snapshot(&self, container_name: impl Into<String>, blob: impl Into<String>) -> create_snapshot::RequestBuilder {
+        pub fn create_snapshot(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> create_snapshot::RequestBuilder {
             create_snapshot::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4736,7 +5545,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn get_account_info(&self, container_name: impl Into<String>, blob: impl Into<String>) -> get_account_info::RequestBuilder {
+        pub fn get_account_info(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> get_account_info::RequestBuilder {
             get_account_info::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4748,7 +5561,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn query(&self, container_name: impl Into<String>, blob: impl Into<String>) -> query::RequestBuilder {
+        pub fn query(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> query::RequestBuilder {
             query::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4773,7 +5590,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn get_tags(&self, container_name: impl Into<String>, blob: impl Into<String>) -> get_tags::RequestBuilder {
+        pub fn get_tags(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> get_tags::RequestBuilder {
             get_tags::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4791,7 +5612,11 @@ pub mod blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn set_tags(&self, container_name: impl Into<String>, blob: impl Into<String>) -> set_tags::RequestBuilder {
+        pub fn set_tags(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> set_tags::RequestBuilder {
             set_tags::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -4827,7 +5652,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -4845,193 +5670,287 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             pub fn x_ms_meta(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
             }
             #[doc = "Optional. Only valid when Object Replication is enabled for the storage container and on the destination blob of the replication."]
             pub fn x_ms_or_policy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-or-policy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-or-policy-id",
+                    ))
             }
             #[doc = "Optional. Only valid when Object Replication is enabled for the storage container and on the source blob of the replication. When retrieving this header, it will return the header with the policy id and rule id (e.g. x-ms-or-policyid_ruleid), and the value will be the status of the replication (e.g. complete, failed)."]
             pub fn x_ms_or(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-or"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-or"))
             }
             #[doc = "The number of bytes present in the response body."]
             pub fn content_length(&self) -> azure_core::Result<i64> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("content-length"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "content-length",
+                ))
             }
             #[doc = "The media type of the body of the response. For Download Blob this is 'application/octet-stream'"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "Indicates the range of bytes returned in the event that the client requested a subset of the blob by setting the 'Range' request header."]
             pub fn content_range(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-range"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-range",
+                    ))
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header returns the value that was specified for the Content-Encoding request header"]
             pub fn content_encoding(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-encoding"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-encoding",
+                    ))
             }
             #[doc = "This header is returned if it was previously specified for the blob."]
             pub fn cache_control(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("cache-control"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "cache-control",
+                    ))
             }
             #[doc = "This header returns the value that was specified for the 'x-ms-blob-content-disposition' header. The Content-Disposition response header field conveys additional information about how to process the response payload, and also can be used to attach additional metadata. For example, if set to attachment, it indicates that the user-agent should not display the response, but instead show a Save As dialog with a filename other than the blob name specified."]
             pub fn content_disposition(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-disposition"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-disposition",
+                    ))
             }
             #[doc = "This header returns the value that was specified for the Content-Language request header."]
             pub fn content_language(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-language"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-language",
+                    ))
             }
             #[doc = "The current sequence number for a page blob. This header is not returned for block blobs or append blobs"]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "The blob's type."]
             pub fn x_ms_blob_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-type",
+                    ))
             }
             #[doc = "Conclusion time of the last attempted Copy Blob operation where this blob was the destination blob. This value can specify the time of a completed, aborted, or failed copy attempt. This header does not appear if a copy is pending, if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List."]
             pub fn x_ms_copy_completion_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-completion-time"))?,
-                )
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-copy-completion-time"),
+                )?)
             }
             #[doc = "Only appears when x-ms-copy-status is failed or pending. Describes the cause of the last fatal or non-fatal copy operation failure. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List"]
             pub fn x_ms_copy_status_description(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status-description"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status-description",
+                    ))
             }
             #[doc = "String identifier for this copy operation. Use with Get Blob Properties to check the status of this copy operation, or pass to Abort Copy Blob to abort a pending copy."]
             pub fn x_ms_copy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-id",
+                    ))
             }
             #[doc = "Contains the number of bytes copied and the total bytes in the source in the last attempted Copy Blob operation where this blob was the destination blob. Can show between 0 and Content-Length bytes copied. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List"]
             pub fn x_ms_copy_progress(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-progress"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-progress",
+                    ))
             }
             #[doc = "URL up to 2 KB in length that specifies the source blob or file used in the last attempted Copy Blob operation where this blob was the destination blob. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List."]
             pub fn x_ms_copy_source(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-source"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-source",
+                    ))
             }
             #[doc = "State of the copy operation identified by x-ms-copy-id."]
             pub fn x_ms_copy_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status",
+                    ))
             }
             #[doc = "When a blob is leased, specifies whether the lease is of infinite or fixed duration."]
             pub fn x_ms_lease_duration(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-duration"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-duration",
+                    ))
             }
             #[doc = "Lease state of the blob."]
             pub fn x_ms_lease_state(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-state"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-state",
+                    ))
             }
             #[doc = "The current lease status of the blob."]
             pub fn x_ms_lease_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-status",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "The value of this header indicates whether version of this blob is a current version, see also x-ms-version-id header."]
             pub fn x_ms_is_current_version(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-is-current-version"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-is-current-version",
+                ))
             }
             #[doc = "Indicates that the service supports requests for partial blob content."]
             pub fn accept_ranges(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("accept-ranges"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "accept-ranges",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The number of committed blocks present in the blob. This header is returned only for append blobs."]
             pub fn x_ms_blob_committed_block_count(&self) -> azure_core::Result<i32> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-committed-block-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-committed-block-count",
+                ))
             }
             #[doc = "The value of this header is set to true if the blob data and application metadata are completely encrypted using the specified algorithm. Otherwise, the value is set to false (when the blob is unencrypted, or if only parts of the blob/application metadata are encrypted)."]
             pub fn x_ms_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
             #[doc = "If the blob has a MD5 hash, and if request contains range header (Range or x-ms-range), this response header is returned with the value of the whole blob's MD5 value. This value may or may not be equal to the value returned in Content-MD5 header, with the latter calculated from the requested range"]
             pub fn x_ms_blob_content_md5(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-content-md5"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-content-md5",
+                    ))
             }
             #[doc = "The number of tags associated with the blob"]
             pub fn x_ms_tag_count(&self) -> azure_core::Result<i64> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-tag-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-tag-count",
+                ))
             }
             #[doc = "If this blob has been sealed"]
             pub fn x_ms_blob_sealed(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sealed"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sealed",
+                ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the blob was last read or written to"]
             pub fn x_ms_last_access_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-last-access-time"))?,
-                )
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-last-access-time"),
+                )?)
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the blob immutability policy will expire."]
-            pub fn x_ms_immutability_policy_until_date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-immutability-policy-until-date"))?,
-                )
+            pub fn x_ms_immutability_policy_until_date(
+                &self,
+            ) -> azure_core::Result<::time::OffsetDateTime> {
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static(
+                        "x-ms-immutability-policy-until-date",
+                    ),
+                )?)
             }
             #[doc = "Indicates immutability policy mode."]
             pub fn x_ms_immutability_policy_mode(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-immutability-policy-mode"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-immutability-policy-mode",
+                    ))
             }
             #[doc = "Indicates if a legal hold is present on the blob."]
             pub fn x_ms_legal_hold(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-legal-hold"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-legal-hold",
+                ))
             }
             #[doc = "If the request is to read a specified range and the x-ms-range-get-content-crc64 is set to true, then the request returns a crc64 for the range, as long as the range size is less than or equal to 4 MB. If both x-ms-range-get-content-crc64 & x-ms-range-get-content-md5 is specified in the same request, it will fail with 400(Bad Request)"]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -5106,7 +6025,10 @@ pub mod blob {
                 self
             }
             #[doc = "When set to true and specified together with the Range, the service returns the CRC64 hash for the range, as long as the range is less than or equal to 4 MB in size."]
-            pub fn x_ms_range_get_content_crc64(mut self, x_ms_range_get_content_crc64: bool) -> Self {
+            pub fn x_ms_range_get_content_crc64(
+                mut self,
+                x_ms_range_get_content_crc64: bool,
+            ) -> Self {
                 self.x_ms_range_get_content_crc64 = Some(x_ms_range_get_content_crc64);
                 self
             }
@@ -5116,22 +6038,34 @@ pub mod blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -5151,7 +6085,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -5166,16 +6103,25 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(versionid) = &this.versionid {
-                            req.url_mut().query_pairs_mut().append_pair("versionid", versionid);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("versionid", versionid);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_range) = &this.x_ms_range {
                             req.insert_header("x-ms-range", x_ms_range);
@@ -5184,25 +6130,42 @@ pub mod blob {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
                         if let Some(x_ms_range_get_content_md5) = &this.x_ms_range_get_content_md5 {
-                            req.insert_header("x-ms-range-get-content-md5", x_ms_range_get_content_md5.to_string());
+                            req.insert_header(
+                                "x-ms-range-get-content-md5",
+                                x_ms_range_get_content_md5.to_string(),
+                            );
                         }
-                        if let Some(x_ms_range_get_content_crc64) = &this.x_ms_range_get_content_crc64 {
-                            req.insert_header("x-ms-range-get-content-crc64", x_ms_range_get_content_crc64.to_string());
+                        if let Some(x_ms_range_get_content_crc64) =
+                            &this.x_ms_range_get_content_crc64
+                        {
+                            req.insert_header(
+                                "x-ms-range-get-content-crc64",
+                                x_ms_range_get_content_crc64.to_string(),
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -5256,7 +6219,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -5275,19 +6238,30 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -5348,17 +6322,26 @@ pub mod blob {
                 self
             }
             #[doc = "Required if the blob has associated snapshots. Specify one of the following two options: include: Delete the base blob and all of its snapshots. only: Delete only the blob's snapshots and not the blob itself"]
-            pub fn x_ms_delete_snapshots(mut self, x_ms_delete_snapshots: impl Into<String>) -> Self {
+            pub fn x_ms_delete_snapshots(
+                mut self,
+                x_ms_delete_snapshots: impl Into<String>,
+            ) -> Self {
                 self.x_ms_delete_snapshots = Some(x_ms_delete_snapshots.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -5378,7 +6361,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -5398,16 +6384,25 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Delete);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(versionid) = &this.versionid {
-                            req.url_mut().query_pairs_mut().append_pair("versionid", versionid);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("versionid", versionid);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -5419,7 +6414,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -5434,7 +6432,9 @@ pub mod blob {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
                         if let Some(deletetype) = &this.deletetype {
-                            req.url_mut().query_pairs_mut().append_pair("deletetype", deletetype);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("deletetype", deletetype);
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -5464,7 +6464,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -5482,226 +6482,326 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "Returns the date and time the blob was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Returns the date and time the blob was created."]
             pub fn x_ms_creation_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-creation-time"))?,
-                )
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-creation-time"),
+                )?)
             }
             pub fn x_ms_meta(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
             }
             #[doc = "Optional. Only valid when Object Replication is enabled for the storage container and on the destination blob of the replication."]
             pub fn x_ms_or_policy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-or-policy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-or-policy-id",
+                    ))
             }
             #[doc = "Optional. Only valid when Object Replication is enabled for the storage container and on the source blob of the replication. When retrieving this header, it will return the header with the policy id and rule id (e.g. x-ms-or-policyid_ruleid), and the value will be the status of the replication (e.g. complete, failed)."]
             pub fn x_ms_or(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-or"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-or"))
             }
             #[doc = "The blob's type."]
             pub fn x_ms_blob_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-type",
+                    ))
             }
             #[doc = "Conclusion time of the last attempted Copy Blob operation where this blob was the destination blob. This value can specify the time of a completed, aborted, or failed copy attempt. This header does not appear if a copy is pending, if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List."]
             pub fn x_ms_copy_completion_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-completion-time"))?,
-                )
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-copy-completion-time"),
+                )?)
             }
             #[doc = "Only appears when x-ms-copy-status is failed or pending. Describes the cause of the last fatal or non-fatal copy operation failure. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List"]
             pub fn x_ms_copy_status_description(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status-description"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status-description",
+                    ))
             }
             #[doc = "String identifier for this copy operation. Use with Get Blob Properties to check the status of this copy operation, or pass to Abort Copy Blob to abort a pending copy."]
             pub fn x_ms_copy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-id",
+                    ))
             }
             #[doc = "Contains the number of bytes copied and the total bytes in the source in the last attempted Copy Blob operation where this blob was the destination blob. Can show between 0 and Content-Length bytes copied. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List"]
             pub fn x_ms_copy_progress(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-progress"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-progress",
+                    ))
             }
             #[doc = "URL up to 2 KB in length that specifies the source blob or file used in the last attempted Copy Blob operation where this blob was the destination blob. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List."]
             pub fn x_ms_copy_source(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-source"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-source",
+                    ))
             }
             #[doc = "State of the copy operation identified by x-ms-copy-id."]
             pub fn x_ms_copy_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status",
+                    ))
             }
             #[doc = "Included if the blob is incremental copy blob."]
             pub fn x_ms_incremental_copy(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-incremental-copy"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-incremental-copy",
+                ))
             }
             #[doc = "Included if the blob is incremental copy blob or incremental copy snapshot, if x-ms-copy-status is success. Snapshot time of the last successful incremental copy snapshot for this blob."]
             pub fn x_ms_copy_destination_snapshot(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-destination-snapshot"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-destination-snapshot",
+                    ))
             }
             #[doc = "When a blob is leased, specifies whether the lease is of infinite or fixed duration."]
             pub fn x_ms_lease_duration(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-duration"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-duration",
+                    ))
             }
             #[doc = "Lease state of the blob."]
             pub fn x_ms_lease_state(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-state"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-state",
+                    ))
             }
             #[doc = "The current lease status of the blob."]
             pub fn x_ms_lease_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-status",
+                    ))
             }
             #[doc = "The number of bytes present in the response body."]
             pub fn content_length(&self) -> azure_core::Result<i64> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("content-length"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "content-length",
+                ))
             }
             #[doc = "The content type specified for the blob. The default content type is 'application/octet-stream'"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header returns the value that was specified for the Content-Encoding request header"]
             pub fn content_encoding(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-encoding"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-encoding",
+                    ))
             }
             #[doc = "This header returns the value that was specified for the 'x-ms-blob-content-disposition' header. The Content-Disposition response header field conveys additional information about how to process the response payload, and also can be used to attach additional metadata. For example, if set to attachment, it indicates that the user-agent should not display the response, but instead show a Save As dialog with a filename other than the blob name specified."]
             pub fn content_disposition(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-disposition"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-disposition",
+                    ))
             }
             #[doc = "This header returns the value that was specified for the Content-Language request header."]
             pub fn content_language(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-language"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-language",
+                    ))
             }
             #[doc = "This header is returned if it was previously specified for the blob."]
             pub fn cache_control(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("cache-control"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "cache-control",
+                    ))
             }
             #[doc = "The current sequence number for a page blob. This header is not returned for block blobs or append blobs"]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "Indicates that the service supports requests for partial blob content."]
             pub fn accept_ranges(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("accept-ranges"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "accept-ranges",
+                    ))
             }
             #[doc = "The number of committed blocks present in the blob. This header is returned only for append blobs."]
             pub fn x_ms_blob_committed_block_count(&self) -> azure_core::Result<i32> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-committed-block-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-committed-block-count",
+                ))
             }
             #[doc = "The value of this header is set to true if the blob data and application metadata are completely encrypted using the specified algorithm. Otherwise, the value is set to false (when the blob is unencrypted, or if only parts of the blob/application metadata are encrypted)."]
             pub fn x_ms_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the metadata. This header is only returned when the metadata was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
             #[doc = "The tier of page blob on a premium storage account or tier of block blob on blob storage LRS accounts. For a list of allowed premium page blob tiers, see https://docs.microsoft.com/en-us/azure/virtual-machines/windows/premium-storage#features. For blob storage LRS accounts, valid values are Hot/Cool/Archive."]
             pub fn x_ms_access_tier(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-access-tier"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-access-tier",
+                    ))
             }
             #[doc = "For page blobs on a premium storage account only. If the access tier is not explicitly set on the blob, the tier is inferred based on its content length and this header will be returned with true value."]
             pub fn x_ms_access_tier_inferred(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-access-tier-inferred"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-access-tier-inferred",
+                ))
             }
             #[doc = "For blob storage LRS accounts, valid values are rehydrate-pending-to-hot/rehydrate-pending-to-cool. If the blob is being rehydrated and is not complete then this header is returned indicating that rehydrate is pending and also tells the destination tier."]
             pub fn x_ms_archive_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-archive-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-archive-status",
+                    ))
             }
             #[doc = "The time the tier was changed on the object. This is only returned if the tier on the block blob was ever set."]
-            pub fn x_ms_access_tier_change_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-access-tier-change-time"))?,
-                )
+            pub fn x_ms_access_tier_change_time(
+                &self,
+            ) -> azure_core::Result<::time::OffsetDateTime> {
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-access-tier-change-time"),
+                )?)
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "The value of this header indicates whether version of this blob is a current version, see also x-ms-version-id header."]
             pub fn x_ms_is_current_version(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-is-current-version"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-is-current-version",
+                ))
             }
             #[doc = "The number of tags associated with the blob"]
             pub fn x_ms_tag_count(&self) -> azure_core::Result<i64> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-tag-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-tag-count",
+                ))
             }
             #[doc = "The time this blob will expire."]
             pub fn x_ms_expiry_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-expiry-time"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-expiry-time"),
+                )?)
             }
             #[doc = "If this blob has been sealed"]
             pub fn x_ms_blob_sealed(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sealed"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sealed",
+                ))
             }
             #[doc = "If an object is in rehydrate pending state then this header is returned with priority of rehydrate. Valid values are High and Standard."]
             pub fn x_ms_rehydrate_priority(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-rehydrate-priority"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-rehydrate-priority",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the blob was last read or written to"]
             pub fn x_ms_last_access_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-last-access-time"))?,
-                )
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-last-access-time"),
+                )?)
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the blob immutability policy will expire."]
-            pub fn x_ms_immutability_policy_until_date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-immutability-policy-until-date"))?,
-                )
+            pub fn x_ms_immutability_policy_until_date(
+                &self,
+            ) -> azure_core::Result<::time::OffsetDateTime> {
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static(
+                        "x-ms-immutability-policy-until-date",
+                    ),
+                )?)
             }
             #[doc = "Indicates immutability policy mode."]
             pub fn x_ms_immutability_policy_mode(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-immutability-policy-mode"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-immutability-policy-mode",
+                    ))
             }
             #[doc = "Indicates if a legal hold is present on the blob."]
             pub fn x_ms_legal_hold(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-legal-hold"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-legal-hold",
+                ))
             }
         }
         #[derive(Clone)]
@@ -5768,22 +6868,34 @@ pub mod blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -5803,7 +6915,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -5818,16 +6933,25 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Head);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(versionid) = &this.versionid {
-                            req.url_mut().query_pairs_mut().append_pair("versionid", versionid);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("versionid", versionid);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -5836,16 +6960,25 @@ pub mod blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -5887,7 +7020,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -5906,19 +7039,30 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated."]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -5954,7 +7098,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -5969,10 +7116,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -5985,7 +7137,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=undelete", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=undelete",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -6005,7 +7160,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -6023,28 +7178,42 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated."]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -6082,7 +7251,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -6102,10 +7274,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -6122,7 +7299,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=expiry", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=expiry",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -6142,7 +7322,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -6160,33 +7340,48 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "The current sequence number for a page blob. This header is not returned for block blobs or append blobs"]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -6234,27 +7429,42 @@ pub mod blob {
                 self
             }
             #[doc = "Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_cache_control(mut self, x_ms_blob_cache_control: impl Into<String>) -> Self {
+            pub fn x_ms_blob_cache_control(
+                mut self,
+                x_ms_blob_cache_control: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_cache_control = Some(x_ms_blob_cache_control.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content type. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_type(mut self, x_ms_blob_content_type: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_type(
+                mut self,
+                x_ms_blob_content_type: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_type = Some(x_ms_blob_content_type.into());
                 self
             }
             #[doc = "Optional. An MD5 hash of the blob content. Note that this hash is not validated, as the hashes for the individual blocks were validated when each was uploaded."]
-            pub fn x_ms_blob_content_md5(mut self, x_ms_blob_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_md5(
+                mut self,
+                x_ms_blob_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_md5 = Some(x_ms_blob_content_md5.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content encoding. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_encoding(mut self, x_ms_blob_content_encoding: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_encoding(
+                mut self,
+                x_ms_blob_content_encoding: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_encoding = Some(x_ms_blob_content_encoding.into());
                 self
             }
             #[doc = "Optional. Set the blob's content language. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_language(mut self, x_ms_blob_content_language: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_language(
+                mut self,
+                x_ms_blob_content_language: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_language = Some(x_ms_blob_content_language.into());
                 self
             }
@@ -6264,12 +7474,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -6289,12 +7505,18 @@ pub mod blob {
                 self
             }
             #[doc = "Optional. Sets the blob's Content-Disposition header."]
-            pub fn x_ms_blob_content_disposition(mut self, x_ms_blob_content_disposition: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_disposition(
+                mut self,
+                x_ms_blob_content_disposition: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_disposition = Some(x_ms_blob_content_disposition.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -6309,10 +7531,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_blob_cache_control) = &this.x_ms_blob_cache_control {
                             req.insert_header("x-ms-blob-cache-control", x_ms_blob_cache_control);
@@ -6324,10 +7551,16 @@ pub mod blob {
                             req.insert_header("x-ms-blob-content-md5", x_ms_blob_content_md5);
                         }
                         if let Some(x_ms_blob_content_encoding) = &this.x_ms_blob_content_encoding {
-                            req.insert_header("x-ms-blob-content-encoding", x_ms_blob_content_encoding);
+                            req.insert_header(
+                                "x-ms-blob-content-encoding",
+                                x_ms_blob_content_encoding,
+                            );
                         }
                         if let Some(x_ms_blob_content_language) = &this.x_ms_blob_content_language {
-                            req.insert_header("x-ms-blob-content-language", x_ms_blob_content_language);
+                            req.insert_header(
+                                "x-ms-blob-content-language",
+                                x_ms_blob_content_language,
+                            );
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -6336,7 +7569,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -6347,8 +7583,13 @@ pub mod blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        if let Some(x_ms_blob_content_disposition) = &this.x_ms_blob_content_disposition {
-                            req.insert_header("x-ms-blob-content-disposition", x_ms_blob_content_disposition);
+                        if let Some(x_ms_blob_content_disposition) =
+                            &this.x_ms_blob_content_disposition
+                        {
+                            req.insert_header(
+                                "x-ms-blob-content-disposition",
+                                x_ms_blob_content_disposition,
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -6361,7 +7602,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=properties&SetHTTPHeaders", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=properties&SetHTTPHeaders",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -6381,7 +7625,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -6400,31 +7644,47 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
-            }
-            #[doc = "Indicates the time the immutability policy will expire."]
-            pub fn x_ms_immutability_policy_until_date(&self) -> azure_core::Result<::time::OffsetDateTime> {
                 azure_core::date::parse_rfc1123(
                     self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-immutability-policy-until-date"))?,
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
                 )
+            }
+            #[doc = "Indicates the time the immutability policy will expire."]
+            pub fn x_ms_immutability_policy_until_date(
+                &self,
+            ) -> azure_core::Result<::time::OffsetDateTime> {
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static(
+                        "x-ms-immutability-policy-until-date",
+                    ),
+                )?)
             }
             #[doc = "Indicates immutability policy mode."]
             pub fn x_ms_immutability_policy_mode(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-immutability-policy-mode"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-immutability-policy-mode",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -6463,12 +7723,18 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -6477,11 +7743,15 @@ pub mod blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -6496,25 +7766,40 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -6524,7 +7809,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=immutabilityPolicies", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=immutabilityPolicies",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -6544,7 +7832,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -6563,19 +7851,30 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -6611,7 +7910,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -6626,10 +7928,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Delete);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -6642,7 +7949,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=immutabilityPolicies", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=immutabilityPolicies",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -6662,7 +7972,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -6681,23 +7991,36 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "Indicates if the blob has a legal hold."]
             pub fn x_ms_legal_hold(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-legal-hold"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-legal-hold",
+                ))
             }
         }
         #[derive(Clone)]
@@ -6734,7 +8057,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -6749,10 +8075,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -6766,7 +8097,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=legalhold", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=legalhold",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -6786,7 +8120,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -6804,47 +8138,69 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the metadata. This header is only returned when the metadata was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -6906,27 +8262,42 @@ pub mod blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -6946,7 +8317,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -6961,10 +8335,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_meta) = &this.x_ms_meta {
                             req.insert_header("x-ms-meta", x_ms_meta);
@@ -6976,10 +8355,16 @@ pub mod blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -6988,7 +8373,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -7010,7 +8398,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=metadata", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=metadata",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -7030,7 +8421,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -7048,32 +8439,49 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the blob was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Uniquely identifies a blobs' lease"]
             pub fn x_ms_lease_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-id",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -7122,17 +8530,26 @@ pub mod blob {
                 self
             }
             #[doc = "Proposed lease ID, in a GUID string format. The Blob service returns 400 (Invalid request) if the proposed lease ID is not in the correct format. See Guid Constructor (String) for a list of valid GUID string formats."]
-            pub fn x_ms_proposed_lease_id(mut self, x_ms_proposed_lease_id: impl Into<String>) -> Self {
+            pub fn x_ms_proposed_lease_id(
+                mut self,
+                x_ms_proposed_lease_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_proposed_lease_id = Some(x_ms_proposed_lease_id.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -7152,7 +8569,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -7167,14 +8587,22 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_duration) = &this.x_ms_lease_duration {
-                            req.insert_header("x-ms-lease-duration", x_ms_lease_duration.to_string());
+                            req.insert_header(
+                                "x-ms-lease-duration",
+                                x_ms_lease_duration.to_string(),
+                            );
                         }
                         if let Some(x_ms_proposed_lease_id) = &this.x_ms_proposed_lease_id {
                             req.insert_header("x-ms-proposed-lease-id", x_ms_proposed_lease_id);
@@ -7183,7 +8611,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -7205,7 +8636,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=lease&acquire", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=lease&acquire",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -7225,7 +8659,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -7243,28 +8677,42 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the blob was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -7307,12 +8755,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -7332,7 +8786,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -7347,18 +8804,26 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-lease-id", &this.x_ms_lease_id);
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -7380,7 +8845,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=lease&release", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=lease&release",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -7400,7 +8868,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -7418,32 +8886,49 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the blob was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Uniquely identifies a blobs' lease"]
             pub fn x_ms_lease_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-id",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -7486,12 +8971,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -7511,7 +9002,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -7526,18 +9020,26 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-lease-id", &this.x_ms_lease_id);
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -7559,7 +9061,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=lease&renew", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=lease&renew",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -7579,7 +9084,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -7597,32 +9102,49 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the blob was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Uniquely identifies a blobs' lease"]
             pub fn x_ms_lease_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -7666,12 +9188,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -7691,7 +9219,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -7706,11 +9237,16 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-lease-id", &this.x_ms_lease_id);
                         req.insert_header("x-ms-proposed-lease-id", &this.x_ms_proposed_lease_id);
@@ -7718,7 +9254,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -7740,7 +9279,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=lease&change", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=lease&change",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -7760,7 +9302,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -7778,32 +9320,48 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the blob was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "Approximate time remaining in the lease period, in seconds."]
             pub fn x_ms_lease_time(&self) -> azure_core::Result<i32> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-lease-time"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-lease-time",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -7851,12 +9409,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -7876,7 +9440,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -7891,20 +9458,31 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-lease-action", &this.x_ms_lease_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_break_period) = &this.x_ms_lease_break_period {
-                            req.insert_header("x-ms-lease-break-period", x_ms_lease_break_period.to_string());
+                            req.insert_header(
+                                "x-ms-lease-break-period",
+                                x_ms_lease_break_period.to_string(),
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -7926,7 +9504,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=lease&break", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=lease&break",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -7946,7 +9527,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -7964,41 +9545,62 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "Uniquely identifies the snapshot and indicates the snapshot version. It may be used in subsequent requests to access the snapshot"]
             pub fn x_ms_snapshot(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-snapshot"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-snapshot",
+                    ))
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "True if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise. For a snapshot request, this header is set to true when metadata was provided in the request and encrypted with a customer-provided key."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
         }
         #[derive(Clone)]
@@ -8055,27 +9657,42 @@ pub mod blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -8100,7 +9717,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -8115,10 +9735,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_meta) = &this.x_ms_meta {
                             req.insert_header("x-ms-meta", x_ms_meta);
@@ -8127,10 +9752,16 @@ pub mod blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -8139,7 +9770,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -8164,7 +9798,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=snapshot", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=snapshot",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -8184,7 +9821,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -8202,40 +9839,63 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "String identifier for this copy operation. Use with Get Blob Properties to check the status of this copy operation, or pass to Abort Copy Blob to abort a pending copy."]
             pub fn x_ms_copy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-id",
+                    ))
             }
             #[doc = "State of the copy operation identified by x-ms-copy-id."]
             pub fn x_ms_copy_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -8301,17 +9961,26 @@ pub mod blob {
                 self
             }
             #[doc = "Optional: Indicates the priority with which to rehydrate an archived blob."]
-            pub fn x_ms_rehydrate_priority(mut self, x_ms_rehydrate_priority: impl Into<String>) -> Self {
+            pub fn x_ms_rehydrate_priority(
+                mut self,
+                x_ms_rehydrate_priority: impl Into<String>,
+            ) -> Self {
                 self.x_ms_rehydrate_priority = Some(x_ms_rehydrate_priority.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn x_ms_source_if_modified_since(mut self, x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_modified_since(
+                mut self,
+                x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_modified_since = Some(x_ms_source_if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn x_ms_source_if_unmodified_since(mut self, x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_unmodified_since(
+                mut self,
+                x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_unmodified_since = Some(x_ms_source_if_unmodified_since.into());
                 self
             }
@@ -8321,7 +9990,10 @@ pub mod blob {
                 self
             }
             #[doc = "Specify an ETag value to operate only on blobs without a matching value."]
-            pub fn x_ms_source_if_none_match(mut self, x_ms_source_if_none_match: impl Into<String>) -> Self {
+            pub fn x_ms_source_if_none_match(
+                mut self,
+                x_ms_source_if_none_match: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_if_none_match = Some(x_ms_source_if_none_match.into());
                 self
             }
@@ -8331,12 +10003,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -8361,7 +10039,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -8380,11 +10061,15 @@ pub mod blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -8404,10 +10089,15 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_meta) = &this.x_ms_meta {
                             req.insert_header("x-ms-meta", x_ms_meta);
@@ -8418,17 +10108,30 @@ pub mod blob {
                         if let Some(x_ms_rehydrate_priority) = &this.x_ms_rehydrate_priority {
                             req.insert_header("x-ms-rehydrate-priority", x_ms_rehydrate_priority);
                         }
-                        if let Some(x_ms_source_if_modified_since) = &this.x_ms_source_if_modified_since {
-                            req.insert_header("x-ms-source-if-modified-since", x_ms_source_if_modified_since.to_string());
+                        if let Some(x_ms_source_if_modified_since) =
+                            &this.x_ms_source_if_modified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-modified-since",
+                                x_ms_source_if_modified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_source_if_unmodified_since) = &this.x_ms_source_if_unmodified_since {
-                            req.insert_header("x-ms-source-if-unmodified-since", x_ms_source_if_unmodified_since.to_string());
+                        if let Some(x_ms_source_if_unmodified_since) =
+                            &this.x_ms_source_if_unmodified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-unmodified-since",
+                                x_ms_source_if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_source_if_match) = &this.x_ms_source_if_match {
                             req.insert_header("x-ms-source-if-match", x_ms_source_if_match);
                         }
                         if let Some(x_ms_source_if_none_match) = &this.x_ms_source_if_none_match {
-                            req.insert_header("x-ms-source-if-none-match", x_ms_source_if_none_match);
+                            req.insert_header(
+                                "x-ms-source-if-none-match",
+                                x_ms_source_if_none_match,
+                            );
                         }
                         if let Some(x_ms_source_if_tags) = &this.x_ms_source_if_tags {
                             req.insert_header("x-ms-source-if-tags", x_ms_source_if_tags);
@@ -8437,7 +10140,10 @@ pub mod blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -8461,14 +10167,21 @@ pub mod blob {
                         if let Some(x_ms_seal_blob) = &this.x_ms_seal_blob {
                             req.insert_header("x-ms-seal-blob", x_ms_seal_blob.to_string());
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         if let Some(x_ms_legal_hold) = &this.x_ms_legal_hold {
                             req.insert_header("x-ms-legal-hold", x_ms_legal_hold.to_string());
@@ -8481,7 +10194,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=copy", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=copy",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -8501,7 +10217,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -8519,53 +10235,82 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "String identifier for this copy operation."]
             pub fn x_ms_copy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-id",
+                    ))
             }
             #[doc = "State of the copy operation identified by x-ms-copy-id."]
             pub fn x_ms_copy_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status",
+                    ))
             }
             #[doc = "This response header is returned so that the client can check for the integrity of the copied content. This header is only returned if the source content MD5 was specified."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This response header is returned so that the client can check for the integrity of the copied content."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -8632,12 +10377,18 @@ pub mod blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn x_ms_source_if_modified_since(mut self, x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_modified_since(
+                mut self,
+                x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_modified_since = Some(x_ms_source_if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn x_ms_source_if_unmodified_since(mut self, x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_unmodified_since(
+                mut self,
+                x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_unmodified_since = Some(x_ms_source_if_unmodified_since.into());
                 self
             }
@@ -8647,17 +10398,26 @@ pub mod blob {
                 self
             }
             #[doc = "Specify an ETag value to operate only on blobs without a matching value."]
-            pub fn x_ms_source_if_none_match(mut self, x_ms_source_if_none_match: impl Into<String>) -> Self {
+            pub fn x_ms_source_if_none_match(
+                mut self,
+                x_ms_source_if_none_match: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_if_none_match = Some(x_ms_source_if_none_match.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -8682,12 +10442,18 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Specify the md5 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_md5(mut self, x_ms_source_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_md5(
+                mut self,
+                x_ms_source_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_md5 = Some(x_ms_source_content_md5.into());
                 self
             }
@@ -8701,11 +10467,15 @@ pub mod blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -8715,12 +10485,18 @@ pub mod blob {
                 self
             }
             #[doc = "Only Bearer type is supported. Credentials should be a valid OAuth access token to copy source."]
-            pub fn x_ms_copy_source_authorization(mut self, x_ms_copy_source_authorization: impl Into<String>) -> Self {
+            pub fn x_ms_copy_source_authorization(
+                mut self,
+                x_ms_copy_source_authorization: impl Into<String>,
+            ) -> Self {
                 self.x_ms_copy_source_authorization = Some(x_ms_copy_source_authorization.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -8735,11 +10511,16 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-requires-sync", &this.x_ms_requires_sync);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_meta) = &this.x_ms_meta {
                             req.insert_header("x-ms-meta", x_ms_meta);
@@ -8747,23 +10528,39 @@ pub mod blob {
                         if let Some(x_ms_access_tier) = &this.x_ms_access_tier {
                             req.insert_header("x-ms-access-tier", x_ms_access_tier);
                         }
-                        if let Some(x_ms_source_if_modified_since) = &this.x_ms_source_if_modified_since {
-                            req.insert_header("x-ms-source-if-modified-since", x_ms_source_if_modified_since.to_string());
+                        if let Some(x_ms_source_if_modified_since) =
+                            &this.x_ms_source_if_modified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-modified-since",
+                                x_ms_source_if_modified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_source_if_unmodified_since) = &this.x_ms_source_if_unmodified_since {
-                            req.insert_header("x-ms-source-if-unmodified-since", x_ms_source_if_unmodified_since.to_string());
+                        if let Some(x_ms_source_if_unmodified_since) =
+                            &this.x_ms_source_if_unmodified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-unmodified-since",
+                                x_ms_source_if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_source_if_match) = &this.x_ms_source_if_match {
                             req.insert_header("x-ms-source-if-match", x_ms_source_if_match);
                         }
                         if let Some(x_ms_source_if_none_match) = &this.x_ms_source_if_none_match {
-                            req.insert_header("x-ms-source-if-none-match", x_ms_source_if_none_match);
+                            req.insert_header(
+                                "x-ms-source-if-none-match",
+                                x_ms_source_if_none_match,
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -8787,20 +10584,32 @@ pub mod blob {
                         if let Some(x_ms_tags) = &this.x_ms_tags {
                             req.insert_header("x-ms-tags", x_ms_tags);
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         if let Some(x_ms_legal_hold) = &this.x_ms_legal_hold {
                             req.insert_header("x-ms-legal-hold", x_ms_legal_hold.to_string());
                         }
-                        if let Some(x_ms_copy_source_authorization) = &this.x_ms_copy_source_authorization {
-                            req.insert_header("x-ms-copy-source-authorization", x_ms_copy_source_authorization);
+                        if let Some(x_ms_copy_source_authorization) =
+                            &this.x_ms_copy_source_authorization
+                        {
+                            req.insert_header(
+                                "x-ms-copy-source-authorization",
+                                x_ms_copy_source_authorization,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -8813,7 +10622,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=copy&sync", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=copy&sync",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -8833,7 +10645,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -8852,19 +10664,30 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -8907,7 +10730,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -8922,11 +10748,16 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-copy-action", &this.x_ms_copy_action);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -8942,7 +10773,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=copy&copyid", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=copy&copyid",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -8962,7 +10796,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -8981,15 +10815,23 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and newer."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -9041,12 +10883,18 @@ pub mod blob {
                 self
             }
             #[doc = "Optional: Indicates the priority with which to rehydrate an archived blob."]
-            pub fn x_ms_rehydrate_priority(mut self, x_ms_rehydrate_priority: impl Into<String>) -> Self {
+            pub fn x_ms_rehydrate_priority(
+                mut self,
+                x_ms_rehydrate_priority: impl Into<String>,
+            ) -> Self {
                 self.x_ms_rehydrate_priority = Some(x_ms_rehydrate_priority.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -9071,16 +10919,25 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(versionid) = &this.versionid {
-                            req.url_mut().query_pairs_mut().append_pair("versionid", versionid);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("versionid", versionid);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-access-tier", &this.x_ms_access_tier);
                         if let Some(x_ms_rehydrate_priority) = &this.x_ms_rehydrate_priority {
@@ -9103,7 +10960,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=tier", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=tier",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -9123,7 +10983,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -9142,27 +11002,44 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "Identifies the sku name of the account"]
             pub fn x_ms_sku_name(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-sku-name"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-sku-name",
+                    ))
             }
             #[doc = "Identifies the account kind"]
             pub fn x_ms_account_kind(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-account-kind"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-account-kind",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -9201,7 +11078,10 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -9211,7 +11091,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?restype=account&comp=properties", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?restype=account&comp=properties",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -9236,7 +11119,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -9254,145 +11137,221 @@ pub mod blob {
         impl<'a> Headers<'a> {
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             pub fn x_ms_meta(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-meta"))
             }
             #[doc = "The number of bytes present in the response body."]
             pub fn content_length(&self) -> azure_core::Result<i64> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("content-length"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "content-length",
+                ))
             }
             #[doc = "The media type of the body of the response. For Download Blob this is 'application/octet-stream'"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "Indicates the range of bytes returned in the event that the client requested a subset of the blob by setting the 'Range' request header."]
             pub fn content_range(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-range"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-range",
+                    ))
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header returns the value that was specified for the Content-Encoding request header"]
             pub fn content_encoding(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-encoding"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-encoding",
+                    ))
             }
             #[doc = "This header is returned if it was previously specified for the blob."]
             pub fn cache_control(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("cache-control"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "cache-control",
+                    ))
             }
             #[doc = "This header returns the value that was specified for the 'x-ms-blob-content-disposition' header. The Content-Disposition response header field conveys additional information about how to process the response payload, and also can be used to attach additional metadata. For example, if set to attachment, it indicates that the user-agent should not display the response, but instead show a Save As dialog with a filename other than the blob name specified."]
             pub fn content_disposition(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-disposition"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-disposition",
+                    ))
             }
             #[doc = "This header returns the value that was specified for the Content-Language request header."]
             pub fn content_language(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-language"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-language",
+                    ))
             }
             #[doc = "The current sequence number for a page blob. This header is not returned for block blobs or append blobs"]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "The blob's type."]
             pub fn x_ms_blob_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-type",
+                    ))
             }
             #[doc = "Conclusion time of the last attempted Copy Blob operation where this blob was the destination blob. This value can specify the time of a completed, aborted, or failed copy attempt. This header does not appear if a copy is pending, if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List."]
             pub fn x_ms_copy_completion_time(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(
-                    self.0
-                        .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-completion-time"))?,
-                )
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("x-ms-copy-completion-time"),
+                )?)
             }
             #[doc = "Only appears when x-ms-copy-status is failed or pending. Describes the cause of the last fatal or non-fatal copy operation failure. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List"]
             pub fn x_ms_copy_status_description(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status-description"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status-description",
+                    ))
             }
             #[doc = "String identifier for this copy operation. Use with Get Blob Properties to check the status of this copy operation, or pass to Abort Copy Blob to abort a pending copy."]
             pub fn x_ms_copy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-id",
+                    ))
             }
             #[doc = "Contains the number of bytes copied and the total bytes in the source in the last attempted Copy Blob operation where this blob was the destination blob. Can show between 0 and Content-Length bytes copied. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List"]
             pub fn x_ms_copy_progress(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-progress"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-progress",
+                    ))
             }
             #[doc = "URL up to 2 KB in length that specifies the source blob or file used in the last attempted Copy Blob operation where this blob was the destination blob. This header does not appear if this blob has never been the destination in a Copy Blob operation, or if this blob has been modified after a concluded Copy Blob operation using Set Blob Properties, Put Blob, or Put Block List."]
             pub fn x_ms_copy_source(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-source"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-source",
+                    ))
             }
             #[doc = "State of the copy operation identified by x-ms-copy-id."]
             pub fn x_ms_copy_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status",
+                    ))
             }
             #[doc = "When a blob is leased, specifies whether the lease is of infinite or fixed duration."]
             pub fn x_ms_lease_duration(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-duration"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-duration",
+                    ))
             }
             #[doc = "Lease state of the blob."]
             pub fn x_ms_lease_state(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-state"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-state",
+                    ))
             }
             #[doc = "The current lease status of the blob."]
             pub fn x_ms_lease_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-lease-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-lease-status",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "Indicates that the service supports requests for partial blob content."]
             pub fn accept_ranges(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("accept-ranges"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "accept-ranges",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The number of committed blocks present in the blob. This header is returned only for append blobs."]
             pub fn x_ms_blob_committed_block_count(&self) -> azure_core::Result<i32> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-committed-block-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-committed-block-count",
+                ))
             }
             #[doc = "The value of this header is set to true if the blob data and application metadata are completely encrypted using the specified algorithm. Otherwise, the value is set to false (when the blob is unencrypted, or if only parts of the blob/application metadata are encrypted)."]
             pub fn x_ms_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
             #[doc = "If the blob has a MD5 hash, and if request contains range header (Range or x-ms-range), this response header is returned with the value of the whole blob's MD5 value. This value may or may not be equal to the value returned in Content-MD5 header, with the latter calculated from the requested range"]
             pub fn x_ms_blob_content_md5(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-content-md5"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-content-md5",
+                    ))
             }
             #[doc = "If the request is to read a specified range and the x-ms-range-get-content-crc64 is set to true, then the request returns a crc64 for the range, as long as the range size is less than or equal to 4 MB. If both x-ms-range-get-content-crc64 and x-ms-range-get-content-md5 is specified in the same request, it will fail with 400(Bad Request)"]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -9459,22 +11418,34 @@ pub mod blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -9494,7 +11465,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -9509,7 +11483,10 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Post);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let req_body = if let Some(query_request) = &this.query_request {
                             req.insert_header("content-type", "application/xml");
@@ -9518,10 +11495,14 @@ pub mod blob {
                             azure_core::EMPTY_BODY
                         };
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -9530,16 +11511,25 @@ pub mod blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -9560,7 +11550,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=query", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=query",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -9597,7 +11590,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -9616,19 +11609,30 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -9668,7 +11672,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -9703,19 +11710,28 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(versionid) = &this.versionid {
-                            req.url_mut().query_pairs_mut().append_pair("versionid", versionid);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("versionid", versionid);
                         }
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
@@ -9731,7 +11747,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=tags", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=tags",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -9763,7 +11782,7 @@ pub mod blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -9782,19 +11801,30 @@ pub mod blob {
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -9851,7 +11881,10 @@ pub mod blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -9881,13 +11914,20 @@ pub mod blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(versionid) = &this.versionid {
-                            req.url_mut().query_pairs_mut().append_pair("versionid", versionid);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("versionid", versionid);
                         }
                         if let Some(content_md5) = &this.content_md5 {
                             req.insert_header("content-md5", content_md5);
@@ -9917,7 +11957,10 @@ pub mod blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=tags", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=tags",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -10120,7 +12163,11 @@ pub mod page_blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn get_page_ranges(&self, container_name: impl Into<String>, blob: impl Into<String>) -> get_page_ranges::RequestBuilder {
+        pub fn get_page_ranges(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> get_page_ranges::RequestBuilder {
             get_page_ranges::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -10270,7 +12317,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -10288,51 +12335,74 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -10399,27 +12469,42 @@ pub mod page_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's content type. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_type(mut self, x_ms_blob_content_type: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_type(
+                mut self,
+                x_ms_blob_content_type: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_type = Some(x_ms_blob_content_type.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content encoding. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_encoding(mut self, x_ms_blob_content_encoding: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_encoding(
+                mut self,
+                x_ms_blob_content_encoding: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_encoding = Some(x_ms_blob_content_encoding.into());
                 self
             }
             #[doc = "Optional. Set the blob's content language. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_language(mut self, x_ms_blob_content_language: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_language(
+                mut self,
+                x_ms_blob_content_language: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_language = Some(x_ms_blob_content_language.into());
                 self
             }
             #[doc = "Optional. An MD5 hash of the blob content. Note that this hash is not validated, as the hashes for the individual blocks were validated when each was uploaded."]
-            pub fn x_ms_blob_content_md5(mut self, x_ms_blob_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_md5(
+                mut self,
+                x_ms_blob_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_md5 = Some(x_ms_blob_content_md5.into());
                 self
             }
             #[doc = "Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_cache_control(mut self, x_ms_blob_cache_control: impl Into<String>) -> Self {
+            pub fn x_ms_blob_cache_control(
+                mut self,
+                x_ms_blob_cache_control: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_cache_control = Some(x_ms_blob_cache_control.into());
                 self
             }
@@ -10434,7 +12519,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's Content-Disposition header."]
-            pub fn x_ms_blob_content_disposition(mut self, x_ms_blob_content_disposition: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_disposition(
+                mut self,
+                x_ms_blob_content_disposition: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_disposition = Some(x_ms_blob_content_disposition.into());
                 self
             }
@@ -10444,27 +12532,42 @@ pub mod page_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -10489,7 +12592,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -10503,11 +12609,15 @@ pub mod page_blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -10527,11 +12637,16 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-blob-type", &this.x_ms_blob_type);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(x_ms_access_tier) = &this.x_ms_access_tier {
@@ -10541,10 +12656,16 @@ pub mod page_blob {
                             req.insert_header("x-ms-blob-content-type", x_ms_blob_content_type);
                         }
                         if let Some(x_ms_blob_content_encoding) = &this.x_ms_blob_content_encoding {
-                            req.insert_header("x-ms-blob-content-encoding", x_ms_blob_content_encoding);
+                            req.insert_header(
+                                "x-ms-blob-content-encoding",
+                                x_ms_blob_content_encoding,
+                            );
                         }
                         if let Some(x_ms_blob_content_language) = &this.x_ms_blob_content_language {
-                            req.insert_header("x-ms-blob-content-language", x_ms_blob_content_language);
+                            req.insert_header(
+                                "x-ms-blob-content-language",
+                                x_ms_blob_content_language,
+                            );
                         }
                         if let Some(x_ms_blob_content_md5) = &this.x_ms_blob_content_md5 {
                             req.insert_header("x-ms-blob-content-md5", x_ms_blob_content_md5);
@@ -10558,17 +12679,28 @@ pub mod page_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_content_disposition) = &this.x_ms_blob_content_disposition {
-                            req.insert_header("x-ms-blob-content-disposition", x_ms_blob_content_disposition);
+                        if let Some(x_ms_blob_content_disposition) =
+                            &this.x_ms_blob_content_disposition
+                        {
+                            req.insert_header(
+                                "x-ms-blob-content-disposition",
+                                x_ms_blob_content_disposition,
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -10577,7 +12709,10 @@ pub mod page_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -10588,9 +12723,15 @@ pub mod page_blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        req.insert_header("x-ms-blob-content-length", this.x_ms_blob_content_length.to_string());
+                        req.insert_header(
+                            "x-ms-blob-content-length",
+                            this.x_ms_blob_content_length.to_string(),
+                        );
                         if let Some(x_ms_blob_sequence_number) = &this.x_ms_blob_sequence_number {
-                            req.insert_header("x-ms-blob-sequence-number", x_ms_blob_sequence_number.to_string());
+                            req.insert_header(
+                                "x-ms-blob-sequence-number",
+                                x_ms_blob_sequence_number.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -10598,14 +12739,21 @@ pub mod page_blob {
                         if let Some(x_ms_tags) = &this.x_ms_tags {
                             req.insert_header("x-ms-tags", x_ms_tags);
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         if let Some(x_ms_legal_hold) = &this.x_ms_legal_hold {
                             req.insert_header("x-ms-legal-hold", x_ms_legal_hold.to_string());
@@ -10618,7 +12766,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?PageBlob", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?PageBlob",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -10638,7 +12789,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -10656,56 +12807,80 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "The current sequence number for the page blob."]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the pages. This header is only returned when the pages were encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -10785,17 +12960,26 @@ pub mod page_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -10815,12 +12999,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -10840,7 +13030,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -10855,7 +13048,10 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-page-write", &this.x_ms_page_write);
                         req.insert_header("content-type", "application/octet-stream");
@@ -10868,7 +13064,9 @@ pub mod page_blob {
                             req.insert_header("x-ms-content-crc64", x_ms_content_crc64);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_range) = &this.x_ms_range {
                             req.insert_header("x-ms-range", x_ms_range);
@@ -10880,28 +13078,46 @@ pub mod page_blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
                         }
                         if let Some(x_ms_if_sequence_number_le) = &this.x_ms_if_sequence_number_le {
-                            req.insert_header("x-ms-if-sequence-number-le", x_ms_if_sequence_number_le.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-le",
+                                x_ms_if_sequence_number_le.to_string(),
+                            );
                         }
                         if let Some(x_ms_if_sequence_number_lt) = &this.x_ms_if_sequence_number_lt {
-                            req.insert_header("x-ms-if-sequence-number-lt", x_ms_if_sequence_number_lt.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-lt",
+                                x_ms_if_sequence_number_lt.to_string(),
+                            );
                         }
                         if let Some(x_ms_if_sequence_number_eq) = &this.x_ms_if_sequence_number_eq {
-                            req.insert_header("x-ms-if-sequence-number-eq", x_ms_if_sequence_number_eq.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-eq",
+                                x_ms_if_sequence_number_eq.to_string(),
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -10922,7 +13138,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=page&update", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=page&update",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -10942,7 +13161,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -10960,41 +13179,60 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "The current sequence number for the page blob."]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -11061,17 +13299,26 @@ pub mod page_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -11091,12 +13338,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -11116,7 +13369,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -11131,12 +13387,17 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-page-write", &this.x_ms_page_write);
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_range) = &this.x_ms_range {
                             req.insert_header("x-ms-range", x_ms_range);
@@ -11148,28 +13409,46 @@ pub mod page_blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
                         }
                         if let Some(x_ms_if_sequence_number_le) = &this.x_ms_if_sequence_number_le {
-                            req.insert_header("x-ms-if-sequence-number-le", x_ms_if_sequence_number_le.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-le",
+                                x_ms_if_sequence_number_le.to_string(),
+                            );
                         }
                         if let Some(x_ms_if_sequence_number_lt) = &this.x_ms_if_sequence_number_lt {
-                            req.insert_header("x-ms-if-sequence-number-lt", x_ms_if_sequence_number_lt.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-lt",
+                                x_ms_if_sequence_number_lt.to_string(),
+                            );
                         }
                         if let Some(x_ms_if_sequence_number_eq) = &this.x_ms_if_sequence_number_eq {
-                            req.insert_header("x-ms-if-sequence-number-eq", x_ms_if_sequence_number_eq.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-eq",
+                                x_ms_if_sequence_number_eq.to_string(),
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -11191,7 +13470,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=page&clear", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=page&clear",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -11211,7 +13493,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -11229,51 +13511,73 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "The current sequence number for the page blob."]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -11329,12 +13633,18 @@ pub mod page_blob {
         }
         impl RequestBuilder {
             #[doc = "Specify the md5 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_md5(mut self, x_ms_source_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_md5(
+                mut self,
+                x_ms_source_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_md5 = Some(x_ms_source_content_md5.into());
                 self
             }
             #[doc = "Specify the crc64 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_crc64(mut self, x_ms_source_content_crc64: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_crc64(
+                mut self,
+                x_ms_source_content_crc64: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_crc64 = Some(x_ms_source_content_crc64.into());
                 self
             }
@@ -11349,17 +13659,26 @@ pub mod page_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -11384,12 +13703,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -11409,12 +13734,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn x_ms_source_if_modified_since(mut self, x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_modified_since(
+                mut self,
+                x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_modified_since = Some(x_ms_source_if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn x_ms_source_if_unmodified_since(mut self, x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_unmodified_since(
+                mut self,
+                x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_unmodified_since = Some(x_ms_source_if_unmodified_since.into());
                 self
             }
@@ -11424,17 +13755,26 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify an ETag value to operate only on blobs without a matching value."]
-            pub fn x_ms_source_if_none_match(mut self, x_ms_source_if_none_match: impl Into<String>) -> Self {
+            pub fn x_ms_source_if_none_match(
+                mut self,
+                x_ms_source_if_none_match: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_if_none_match = Some(x_ms_source_if_none_match.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Only Bearer type is supported. Credentials should be a valid OAuth access token to copy source."]
-            pub fn x_ms_copy_source_authorization(mut self, x_ms_copy_source_authorization: impl Into<String>) -> Self {
+            pub fn x_ms_copy_source_authorization(
+                mut self,
+                x_ms_copy_source_authorization: impl Into<String>,
+            ) -> Self {
                 self.x_ms_copy_source_authorization = Some(x_ms_copy_source_authorization.into());
                 self
             }
@@ -11449,7 +13789,10 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-page-write", &this.x_ms_page_write);
                         req.insert_header("x-ms-copy-source", &this.x_ms_copy_source);
@@ -11458,21 +13801,32 @@ pub mod page_blob {
                             req.insert_header("x-ms-source-content-md5", x_ms_source_content_md5);
                         }
                         if let Some(x_ms_source_content_crc64) = &this.x_ms_source_content_crc64 {
-                            req.insert_header("x-ms-source-content-crc64", x_ms_source_content_crc64);
+                            req.insert_header(
+                                "x-ms-source-content-crc64",
+                                x_ms_source_content_crc64,
+                            );
                         }
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("x-ms-range", &this.x_ms_range);
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -11481,19 +13835,31 @@ pub mod page_blob {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
                         if let Some(x_ms_if_sequence_number_le) = &this.x_ms_if_sequence_number_le {
-                            req.insert_header("x-ms-if-sequence-number-le", x_ms_if_sequence_number_le.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-le",
+                                x_ms_if_sequence_number_le.to_string(),
+                            );
                         }
                         if let Some(x_ms_if_sequence_number_lt) = &this.x_ms_if_sequence_number_lt {
-                            req.insert_header("x-ms-if-sequence-number-lt", x_ms_if_sequence_number_lt.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-lt",
+                                x_ms_if_sequence_number_lt.to_string(),
+                            );
                         }
                         if let Some(x_ms_if_sequence_number_eq) = &this.x_ms_if_sequence_number_eq {
-                            req.insert_header("x-ms-if-sequence-number-eq", x_ms_if_sequence_number_eq.to_string());
+                            req.insert_header(
+                                "x-ms-if-sequence-number-eq",
+                                x_ms_if_sequence_number_eq.to_string(),
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -11504,23 +13870,41 @@ pub mod page_blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        if let Some(x_ms_source_if_modified_since) = &this.x_ms_source_if_modified_since {
-                            req.insert_header("x-ms-source-if-modified-since", x_ms_source_if_modified_since.to_string());
+                        if let Some(x_ms_source_if_modified_since) =
+                            &this.x_ms_source_if_modified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-modified-since",
+                                x_ms_source_if_modified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_source_if_unmodified_since) = &this.x_ms_source_if_unmodified_since {
-                            req.insert_header("x-ms-source-if-unmodified-since", x_ms_source_if_unmodified_since.to_string());
+                        if let Some(x_ms_source_if_unmodified_since) =
+                            &this.x_ms_source_if_unmodified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-unmodified-since",
+                                x_ms_source_if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_source_if_match) = &this.x_ms_source_if_match {
                             req.insert_header("x-ms-source-if-match", x_ms_source_if_match);
                         }
                         if let Some(x_ms_source_if_none_match) = &this.x_ms_source_if_none_match {
-                            req.insert_header("x-ms-source-if-none-match", x_ms_source_if_none_match);
+                            req.insert_header(
+                                "x-ms-source-if-none-match",
+                                x_ms_source_if_none_match,
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
-                        if let Some(x_ms_copy_source_authorization) = &this.x_ms_copy_source_authorization {
-                            req.insert_header("x-ms-copy-source-authorization", x_ms_copy_source_authorization);
+                        if let Some(x_ms_copy_source_authorization) =
+                            &this.x_ms_copy_source_authorization
+                        {
+                            req.insert_header(
+                                "x-ms-copy-source-authorization",
+                                x_ms_copy_source_authorization,
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -11530,7 +13914,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=page&update&fromUrl", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=page&update&fromUrl",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -11555,7 +13942,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -11573,33 +13960,48 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "The size of the blob in bytes."]
             pub fn x_ms_blob_content_length(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-content-length"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-content-length",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -11660,12 +14062,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -11685,7 +14093,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -11699,20 +14110,29 @@ pub mod page_blob {
                 self.maxresults = Some(maxresults);
                 self
             }
-            pub fn into_stream(self) -> azure_core::Pageable<models::PageList, azure_core::error::Error> {
+            pub fn into_stream(
+                self,
+            ) -> azure_core::Pageable<models::PageList, azure_core::error::Error> {
                 let make_request = move |continuation: Option<String>| {
                     let this = self.clone();
                     async move {
                         let mut url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_range) = &this.x_ms_range {
                             req.insert_header("x-ms-range", x_ms_range);
@@ -11724,7 +14144,10 @@ pub mod page_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -11739,10 +14162,14 @@ pub mod page_blob {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
                         if let Some(marker) = &this.marker {
-                            req.url_mut().query_pairs_mut().append_pair("marker", marker);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("marker", marker);
                         }
                         if let Some(maxresults) = &this.maxresults {
-                            req.url_mut().query_pairs_mut().append_pair("maxresults", &maxresults.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("maxresults", &maxresults.to_string());
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         if let Some(value) = continuation.as_ref() {
@@ -11752,10 +14179,12 @@ pub mod page_blob {
                         let rsp = this.client.send(&mut req).await?;
                         let rsp = match rsp.status() {
                             azure_core::StatusCode::Ok => Ok(Response(rsp)),
-                            status_code => Err(azure_core::error::Error::from(azure_core::error::ErrorKind::HttpResponse {
-                                status: status_code,
-                                error_code: None,
-                            })),
+                            status_code => Err(azure_core::error::Error::from(
+                                azure_core::error::ErrorKind::HttpResponse {
+                                    status: status_code,
+                                    error_code: None,
+                                },
+                            )),
                         };
                         rsp?.into_body().await
                     }
@@ -11764,7 +14193,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=pagelist", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=pagelist",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -11789,7 +14221,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -11807,33 +14239,48 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "The size of the blob in bytes."]
             pub fn x_ms_blob_content_length(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-content-length"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-content-length",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -11891,7 +14338,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Optional. This header is only supported in service versions 2019-04-19 and after and specifies the URL of a previous snapshot of the target blob. The response will only contain pages that were changed between the target blob and its previous snapshot."]
-            pub fn x_ms_previous_snapshot_url(mut self, x_ms_previous_snapshot_url: impl Into<String>) -> Self {
+            pub fn x_ms_previous_snapshot_url(
+                mut self,
+                x_ms_previous_snapshot_url: impl Into<String>,
+            ) -> Self {
                 self.x_ms_previous_snapshot_url = Some(x_ms_previous_snapshot_url.into());
                 self
             }
@@ -11906,12 +14356,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -11931,7 +14387,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -11945,26 +14404,40 @@ pub mod page_blob {
                 self.maxresults = Some(maxresults);
                 self
             }
-            pub fn into_stream(self) -> azure_core::Pageable<models::PageList, azure_core::error::Error> {
+            pub fn into_stream(
+                self,
+            ) -> azure_core::Pageable<models::PageList, azure_core::error::Error> {
                 let make_request = move |continuation: Option<String>| {
                     let this = self.clone();
                     async move {
                         let mut url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(prevsnapshot) = &this.prevsnapshot {
-                            req.url_mut().query_pairs_mut().append_pair("prevsnapshot", prevsnapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("prevsnapshot", prevsnapshot);
                         }
                         if let Some(x_ms_previous_snapshot_url) = &this.x_ms_previous_snapshot_url {
-                            req.insert_header("x-ms-previous-snapshot-url", x_ms_previous_snapshot_url);
+                            req.insert_header(
+                                "x-ms-previous-snapshot-url",
+                                x_ms_previous_snapshot_url,
+                            );
                         }
                         if let Some(x_ms_range) = &this.x_ms_range {
                             req.insert_header("x-ms-range", x_ms_range);
@@ -11976,7 +14449,10 @@ pub mod page_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -11991,10 +14467,14 @@ pub mod page_blob {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
                         if let Some(marker) = &this.marker {
-                            req.url_mut().query_pairs_mut().append_pair("marker", marker);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("marker", marker);
                         }
                         if let Some(maxresults) = &this.maxresults {
-                            req.url_mut().query_pairs_mut().append_pair("maxresults", &maxresults.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("maxresults", &maxresults.to_string());
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         if let Some(value) = continuation.as_ref() {
@@ -12004,10 +14484,12 @@ pub mod page_blob {
                         let rsp = this.client.send(&mut req).await?;
                         let rsp = match rsp.status() {
                             azure_core::StatusCode::Ok => Ok(Response(rsp)),
-                            status_code => Err(azure_core::error::Error::from(azure_core::error::ErrorKind::HttpResponse {
-                                status: status_code,
-                                error_code: None,
-                            })),
+                            status_code => Err(azure_core::error::Error::from(
+                                azure_core::error::ErrorKind::HttpResponse {
+                                    status: status_code,
+                                    error_code: None,
+                                },
+                            )),
                         };
                         rsp?.into_body().await
                     }
@@ -12016,7 +14498,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=pagelist&diff", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=pagelist&diff",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -12036,7 +14521,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -12054,33 +14539,48 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "The current sequence number for a page blob. This header is not returned for block blobs or append blobs"]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -12137,27 +14637,42 @@ pub mod page_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -12177,7 +14692,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -12192,10 +14710,15 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -12204,10 +14727,16 @@ pub mod page_blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -12216,7 +14745,10 @@ pub mod page_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -12227,7 +14759,10 @@ pub mod page_blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        req.insert_header("x-ms-blob-content-length", this.x_ms_blob_content_length.to_string());
+                        req.insert_header(
+                            "x-ms-blob-content-length",
+                            this.x_ms_blob_content_length.to_string(),
+                        );
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
@@ -12239,7 +14774,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=properties&Resize", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=properties&Resize",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -12259,7 +14797,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -12277,33 +14815,48 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "The current sequence number for a page blob. This header is not returned for block blobs or append blobs"]
             pub fn x_ms_blob_sequence_number(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sequence-number"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sequence-number",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -12352,12 +14905,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -12382,7 +14941,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -12397,10 +14959,15 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -12409,7 +14976,10 @@ pub mod page_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -12420,9 +14990,15 @@ pub mod page_blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        req.insert_header("x-ms-sequence-number-action", &this.x_ms_sequence_number_action);
+                        req.insert_header(
+                            "x-ms-sequence-number-action",
+                            &this.x_ms_sequence_number_action,
+                        );
                         if let Some(x_ms_blob_sequence_number) = &this.x_ms_blob_sequence_number {
-                            req.insert_header("x-ms-blob-sequence-number", x_ms_blob_sequence_number.to_string());
+                            req.insert_header(
+                                "x-ms-blob-sequence-number",
+                                x_ms_blob_sequence_number.to_string(),
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -12458,7 +15034,7 @@ pub mod page_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -12476,36 +15052,56 @@ pub mod page_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "String identifier for this copy operation. Use with Get Blob Properties to check the status of this copy operation, or pass to Abort Copy Blob to abort a pending copy."]
             pub fn x_ms_copy_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-id",
+                    ))
             }
             #[doc = "State of the copy operation identified by x-ms-copy-id."]
             pub fn x_ms_copy_status(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-copy-status"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-copy-status",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -12547,12 +15143,18 @@ pub mod page_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -12572,7 +15174,10 @@ pub mod page_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -12587,16 +15192,24 @@ pub mod page_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -12619,7 +15232,10 @@ pub mod page_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=incrementalcopy", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=incrementalcopy",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -12766,7 +15382,11 @@ pub mod append_blob {
         #[doc = "Arguments:"]
         #[doc = "* `container_name`: The container name."]
         #[doc = "* `blob`: The blob name."]
-        pub fn seal(&self, container_name: impl Into<String>, blob: impl Into<String>) -> seal::RequestBuilder {
+        pub fn seal(
+            &self,
+            container_name: impl Into<String>,
+            blob: impl Into<String>,
+        ) -> seal::RequestBuilder {
             seal::RequestBuilder {
                 client: self.0.clone(),
                 container_name: container_name.into(),
@@ -12797,7 +15417,7 @@ pub mod append_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -12815,51 +15435,74 @@ pub mod append_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -12918,27 +15561,42 @@ pub mod append_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's content type. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_type(mut self, x_ms_blob_content_type: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_type(
+                mut self,
+                x_ms_blob_content_type: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_type = Some(x_ms_blob_content_type.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content encoding. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_encoding(mut self, x_ms_blob_content_encoding: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_encoding(
+                mut self,
+                x_ms_blob_content_encoding: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_encoding = Some(x_ms_blob_content_encoding.into());
                 self
             }
             #[doc = "Optional. Set the blob's content language. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_language(mut self, x_ms_blob_content_language: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_language(
+                mut self,
+                x_ms_blob_content_language: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_language = Some(x_ms_blob_content_language.into());
                 self
             }
             #[doc = "Optional. An MD5 hash of the blob content. Note that this hash is not validated, as the hashes for the individual blocks were validated when each was uploaded."]
-            pub fn x_ms_blob_content_md5(mut self, x_ms_blob_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_md5(
+                mut self,
+                x_ms_blob_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_md5 = Some(x_ms_blob_content_md5.into());
                 self
             }
             #[doc = "Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_cache_control(mut self, x_ms_blob_cache_control: impl Into<String>) -> Self {
+            pub fn x_ms_blob_cache_control(
+                mut self,
+                x_ms_blob_cache_control: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_cache_control = Some(x_ms_blob_cache_control.into());
                 self
             }
@@ -12953,7 +15611,10 @@ pub mod append_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's Content-Disposition header."]
-            pub fn x_ms_blob_content_disposition(mut self, x_ms_blob_content_disposition: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_disposition(
+                mut self,
+                x_ms_blob_content_disposition: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_disposition = Some(x_ms_blob_content_disposition.into());
                 self
             }
@@ -12963,27 +15624,42 @@ pub mod append_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -13003,7 +15679,10 @@ pub mod append_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -13017,11 +15696,15 @@ pub mod append_blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -13041,21 +15724,32 @@ pub mod append_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-blob-type", &this.x_ms_blob_type);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(x_ms_blob_content_type) = &this.x_ms_blob_content_type {
                             req.insert_header("x-ms-blob-content-type", x_ms_blob_content_type);
                         }
                         if let Some(x_ms_blob_content_encoding) = &this.x_ms_blob_content_encoding {
-                            req.insert_header("x-ms-blob-content-encoding", x_ms_blob_content_encoding);
+                            req.insert_header(
+                                "x-ms-blob-content-encoding",
+                                x_ms_blob_content_encoding,
+                            );
                         }
                         if let Some(x_ms_blob_content_language) = &this.x_ms_blob_content_language {
-                            req.insert_header("x-ms-blob-content-language", x_ms_blob_content_language);
+                            req.insert_header(
+                                "x-ms-blob-content-language",
+                                x_ms_blob_content_language,
+                            );
                         }
                         if let Some(x_ms_blob_content_md5) = &this.x_ms_blob_content_md5 {
                             req.insert_header("x-ms-blob-content-md5", x_ms_blob_content_md5);
@@ -13069,17 +15763,28 @@ pub mod append_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_content_disposition) = &this.x_ms_blob_content_disposition {
-                            req.insert_header("x-ms-blob-content-disposition", x_ms_blob_content_disposition);
+                        if let Some(x_ms_blob_content_disposition) =
+                            &this.x_ms_blob_content_disposition
+                        {
+                            req.insert_header(
+                                "x-ms-blob-content-disposition",
+                                x_ms_blob_content_disposition,
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -13088,7 +15793,10 @@ pub mod append_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -13105,14 +15813,21 @@ pub mod append_blob {
                         if let Some(x_ms_tags) = &this.x_ms_tags {
                             req.insert_header("x-ms-tags", x_ms_tags);
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         if let Some(x_ms_legal_hold) = &this.x_ms_legal_hold {
                             req.insert_header("x-ms-legal-hold", x_ms_legal_hold.to_string());
@@ -13125,7 +15840,10 @@ pub mod append_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?AppendBlob", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?AppendBlob",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -13145,7 +15863,7 @@ pub mod append_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -13163,61 +15881,87 @@ pub mod append_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "This response header is returned only for append operations. It returns the offset at which the block was committed, in bytes."]
             pub fn x_ms_blob_append_offset(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-append-offset"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-append-offset",
+                    ))
             }
             #[doc = "The number of committed blocks present in the blob. This header is returned only for append blobs."]
             pub fn x_ms_blob_committed_block_count(&self) -> azure_core::Result<i32> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-committed-block-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-committed-block-count",
+                ))
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the block. This header is only returned when the block was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -13289,7 +16033,10 @@ pub mod append_blob {
                 self
             }
             #[doc = "Optional conditional header, used only for the Append Block operation. A number indicating the byte offset to compare. Append Block will succeed only if the append position is equal to this number. If it is not, the request will fail with the AppendPositionConditionNotMet error (HTTP status code 412 - Precondition Failed)."]
-            pub fn x_ms_blob_condition_appendpos(mut self, x_ms_blob_condition_appendpos: i64) -> Self {
+            pub fn x_ms_blob_condition_appendpos(
+                mut self,
+                x_ms_blob_condition_appendpos: i64,
+            ) -> Self {
                 self.x_ms_blob_condition_appendpos = Some(x_ms_blob_condition_appendpos);
                 self
             }
@@ -13299,27 +16046,42 @@ pub mod append_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -13339,7 +16101,10 @@ pub mod append_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -13354,12 +16119,17 @@ pub mod append_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("content-type", "application/octet-stream");
                         let req_body = azure_core::to_json(&this.body)?;
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(content_md5) = &this.content_md5 {
@@ -13371,20 +16141,35 @@ pub mod append_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_condition_maxsize) = &this.x_ms_blob_condition_maxsize {
-                            req.insert_header("x-ms-blob-condition-maxsize", x_ms_blob_condition_maxsize.to_string());
+                        if let Some(x_ms_blob_condition_maxsize) = &this.x_ms_blob_condition_maxsize
+                        {
+                            req.insert_header(
+                                "x-ms-blob-condition-maxsize",
+                                x_ms_blob_condition_maxsize.to_string(),
+                            );
                         }
-                        if let Some(x_ms_blob_condition_appendpos) = &this.x_ms_blob_condition_appendpos {
-                            req.insert_header("x-ms-blob-condition-appendpos", x_ms_blob_condition_appendpos.to_string());
+                        if let Some(x_ms_blob_condition_appendpos) =
+                            &this.x_ms_blob_condition_appendpos
+                        {
+                            req.insert_header(
+                                "x-ms-blob-condition-appendpos",
+                                x_ms_blob_condition_appendpos.to_string(),
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -13393,7 +16178,10 @@ pub mod append_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -13414,7 +16202,10 @@ pub mod append_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=appendblock", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=appendblock",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -13434,7 +16225,7 @@ pub mod append_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -13452,56 +16243,80 @@ pub mod append_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "This response header is returned only for append operations. It returns the offset at which the block was committed, in bytes."]
             pub fn x_ms_blob_append_offset(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-blob-append-offset"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-blob-append-offset",
+                    ))
             }
             #[doc = "The number of committed blocks present in the blob. This header is returned only for append blobs."]
             pub fn x_ms_blob_committed_block_count(&self) -> azure_core::Result<i32> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-committed-block-count"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-committed-block-count",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the block. This header is only returned when the block was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
         }
         #[derive(Clone)]
@@ -13560,12 +16375,18 @@ pub mod append_blob {
                 self
             }
             #[doc = "Specify the md5 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_md5(mut self, x_ms_source_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_md5(
+                mut self,
+                x_ms_source_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_md5 = Some(x_ms_source_content_md5.into());
                 self
             }
             #[doc = "Specify the crc64 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_crc64(mut self, x_ms_source_content_crc64: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_crc64(
+                mut self,
+                x_ms_source_content_crc64: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_crc64 = Some(x_ms_source_content_crc64.into());
                 self
             }
@@ -13585,17 +16406,26 @@ pub mod append_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -13610,17 +16440,26 @@ pub mod append_blob {
                 self
             }
             #[doc = "Optional conditional header, used only for the Append Block operation. A number indicating the byte offset to compare. Append Block will succeed only if the append position is equal to this number. If it is not, the request will fail with the AppendPositionConditionNotMet error (HTTP status code 412 - Precondition Failed)."]
-            pub fn x_ms_blob_condition_appendpos(mut self, x_ms_blob_condition_appendpos: i64) -> Self {
+            pub fn x_ms_blob_condition_appendpos(
+                mut self,
+                x_ms_blob_condition_appendpos: i64,
+            ) -> Self {
                 self.x_ms_blob_condition_appendpos = Some(x_ms_blob_condition_appendpos);
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -13640,12 +16479,18 @@ pub mod append_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn x_ms_source_if_modified_since(mut self, x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_modified_since(
+                mut self,
+                x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_modified_since = Some(x_ms_source_if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn x_ms_source_if_unmodified_since(mut self, x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_unmodified_since(
+                mut self,
+                x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_unmodified_since = Some(x_ms_source_if_unmodified_since.into());
                 self
             }
@@ -13655,17 +16500,26 @@ pub mod append_blob {
                 self
             }
             #[doc = "Specify an ETag value to operate only on blobs without a matching value."]
-            pub fn x_ms_source_if_none_match(mut self, x_ms_source_if_none_match: impl Into<String>) -> Self {
+            pub fn x_ms_source_if_none_match(
+                mut self,
+                x_ms_source_if_none_match: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_if_none_match = Some(x_ms_source_if_none_match.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Only Bearer type is supported. Credentials should be a valid OAuth access token to copy source."]
-            pub fn x_ms_copy_source_authorization(mut self, x_ms_copy_source_authorization: impl Into<String>) -> Self {
+            pub fn x_ms_copy_source_authorization(
+                mut self,
+                x_ms_copy_source_authorization: impl Into<String>,
+            ) -> Self {
                 self.x_ms_copy_source_authorization = Some(x_ms_copy_source_authorization.into());
                 self
             }
@@ -13680,7 +16534,10 @@ pub mod append_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-copy-source", &this.x_ms_copy_source);
                         if let Some(x_ms_source_range) = &this.x_ms_source_range {
@@ -13690,10 +16547,15 @@ pub mod append_blob {
                             req.insert_header("x-ms-source-content-md5", x_ms_source_content_md5);
                         }
                         if let Some(x_ms_source_content_crc64) = &this.x_ms_source_content_crc64 {
-                            req.insert_header("x-ms-source-content-crc64", x_ms_source_content_crc64);
+                            req.insert_header(
+                                "x-ms-source-content-crc64",
+                                x_ms_source_content_crc64,
+                            );
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(content_md5) = &this.content_md5 {
@@ -13703,10 +16565,16 @@ pub mod append_blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -13714,17 +16582,29 @@ pub mod append_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_condition_maxsize) = &this.x_ms_blob_condition_maxsize {
-                            req.insert_header("x-ms-blob-condition-maxsize", x_ms_blob_condition_maxsize.to_string());
+                        if let Some(x_ms_blob_condition_maxsize) = &this.x_ms_blob_condition_maxsize
+                        {
+                            req.insert_header(
+                                "x-ms-blob-condition-maxsize",
+                                x_ms_blob_condition_maxsize.to_string(),
+                            );
                         }
-                        if let Some(x_ms_blob_condition_appendpos) = &this.x_ms_blob_condition_appendpos {
-                            req.insert_header("x-ms-blob-condition-appendpos", x_ms_blob_condition_appendpos.to_string());
+                        if let Some(x_ms_blob_condition_appendpos) =
+                            &this.x_ms_blob_condition_appendpos
+                        {
+                            req.insert_header(
+                                "x-ms-blob-condition-appendpos",
+                                x_ms_blob_condition_appendpos.to_string(),
+                            );
                         }
                         if let Some(if_modified_since) = &this.if_modified_since {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -13735,23 +16615,41 @@ pub mod append_blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        if let Some(x_ms_source_if_modified_since) = &this.x_ms_source_if_modified_since {
-                            req.insert_header("x-ms-source-if-modified-since", x_ms_source_if_modified_since.to_string());
+                        if let Some(x_ms_source_if_modified_since) =
+                            &this.x_ms_source_if_modified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-modified-since",
+                                x_ms_source_if_modified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_source_if_unmodified_since) = &this.x_ms_source_if_unmodified_since {
-                            req.insert_header("x-ms-source-if-unmodified-since", x_ms_source_if_unmodified_since.to_string());
+                        if let Some(x_ms_source_if_unmodified_since) =
+                            &this.x_ms_source_if_unmodified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-unmodified-since",
+                                x_ms_source_if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_source_if_match) = &this.x_ms_source_if_match {
                             req.insert_header("x-ms-source-if-match", x_ms_source_if_match);
                         }
                         if let Some(x_ms_source_if_none_match) = &this.x_ms_source_if_none_match {
-                            req.insert_header("x-ms-source-if-none-match", x_ms_source_if_none_match);
+                            req.insert_header(
+                                "x-ms-source-if-none-match",
+                                x_ms_source_if_none_match,
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
-                        if let Some(x_ms_copy_source_authorization) = &this.x_ms_copy_source_authorization {
-                            req.insert_header("x-ms-copy-source-authorization", x_ms_copy_source_authorization);
+                        if let Some(x_ms_copy_source_authorization) =
+                            &this.x_ms_copy_source_authorization
+                        {
+                            req.insert_header(
+                                "x-ms-copy-source-authorization",
+                                x_ms_copy_source_authorization,
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -13761,7 +16659,10 @@ pub mod append_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=appendblock&fromUrl", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=appendblock&fromUrl",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -13781,7 +16682,7 @@ pub mod append_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -13799,32 +16700,48 @@ pub mod append_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "If this blob has been sealed"]
             pub fn x_ms_blob_sealed(&self) -> azure_core::Result<bool> {
-                self.0.get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-sealed"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-sealed",
+                ))
             }
         }
         #[derive(Clone)]
@@ -13866,7 +16783,10 @@ pub mod append_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -13876,12 +16796,18 @@ pub mod append_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -13896,7 +16822,10 @@ pub mod append_blob {
                 self
             }
             #[doc = "Optional conditional header, used only for the Append Block operation. A number indicating the byte offset to compare. Append Block will succeed only if the append position is equal to this number. If it is not, the request will fail with the AppendPositionConditionNotMet error (HTTP status code 412 - Precondition Failed)."]
-            pub fn x_ms_blob_condition_appendpos(mut self, x_ms_blob_condition_appendpos: i64) -> Self {
+            pub fn x_ms_blob_condition_appendpos(
+                mut self,
+                x_ms_blob_condition_appendpos: i64,
+            ) -> Self {
                 self.x_ms_blob_condition_appendpos = Some(x_ms_blob_condition_appendpos);
                 self
             }
@@ -13911,10 +16840,15 @@ pub mod append_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
@@ -13926,7 +16860,10 @@ pub mod append_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -13934,8 +16871,13 @@ pub mod append_blob {
                         if let Some(if_none_match) = &this.if_none_match {
                             req.insert_header("if-none-match", if_none_match);
                         }
-                        if let Some(x_ms_blob_condition_appendpos) = &this.x_ms_blob_condition_appendpos {
-                            req.insert_header("x-ms-blob-condition-appendpos", x_ms_blob_condition_appendpos.to_string());
+                        if let Some(x_ms_blob_condition_appendpos) =
+                            &this.x_ms_blob_condition_appendpos
+                        {
+                            req.insert_header(
+                                "x-ms-blob-condition-appendpos",
+                                x_ms_blob_condition_appendpos.to_string(),
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -13945,7 +16887,10 @@ pub mod append_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=seal", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=seal",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -14223,7 +17168,7 @@ pub mod block_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -14241,51 +17186,74 @@ pub mod block_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -14352,27 +17320,42 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's content type. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_type(mut self, x_ms_blob_content_type: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_type(
+                mut self,
+                x_ms_blob_content_type: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_type = Some(x_ms_blob_content_type.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content encoding. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_encoding(mut self, x_ms_blob_content_encoding: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_encoding(
+                mut self,
+                x_ms_blob_content_encoding: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_encoding = Some(x_ms_blob_content_encoding.into());
                 self
             }
             #[doc = "Optional. Set the blob's content language. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_language(mut self, x_ms_blob_content_language: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_language(
+                mut self,
+                x_ms_blob_content_language: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_language = Some(x_ms_blob_content_language.into());
                 self
             }
             #[doc = "Optional. An MD5 hash of the blob content. Note that this hash is not validated, as the hashes for the individual blocks were validated when each was uploaded."]
-            pub fn x_ms_blob_content_md5(mut self, x_ms_blob_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_md5(
+                mut self,
+                x_ms_blob_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_md5 = Some(x_ms_blob_content_md5.into());
                 self
             }
             #[doc = "Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_cache_control(mut self, x_ms_blob_cache_control: impl Into<String>) -> Self {
+            pub fn x_ms_blob_cache_control(
+                mut self,
+                x_ms_blob_cache_control: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_cache_control = Some(x_ms_blob_cache_control.into());
                 self
             }
@@ -14387,7 +17370,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's Content-Disposition header."]
-            pub fn x_ms_blob_content_disposition(mut self, x_ms_blob_content_disposition: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_disposition(
+                mut self,
+                x_ms_blob_content_disposition: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_disposition = Some(x_ms_blob_content_disposition.into());
                 self
             }
@@ -14397,17 +17383,26 @@ pub mod block_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -14417,12 +17412,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -14442,7 +17443,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -14456,11 +17460,15 @@ pub mod block_blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -14480,13 +17488,18 @@ pub mod block_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-blob-type", &this.x_ms_blob_type);
                         req.insert_header("content-type", "application/octet-stream");
                         let req_body = azure_core::to_json(&this.body)?;
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(content_md5) = &this.content_md5 {
                             req.insert_header("content-md5", content_md5);
@@ -14496,10 +17509,16 @@ pub mod block_blob {
                             req.insert_header("x-ms-blob-content-type", x_ms_blob_content_type);
                         }
                         if let Some(x_ms_blob_content_encoding) = &this.x_ms_blob_content_encoding {
-                            req.insert_header("x-ms-blob-content-encoding", x_ms_blob_content_encoding);
+                            req.insert_header(
+                                "x-ms-blob-content-encoding",
+                                x_ms_blob_content_encoding,
+                            );
                         }
                         if let Some(x_ms_blob_content_language) = &this.x_ms_blob_content_language {
-                            req.insert_header("x-ms-blob-content-language", x_ms_blob_content_language);
+                            req.insert_header(
+                                "x-ms-blob-content-language",
+                                x_ms_blob_content_language,
+                            );
                         }
                         if let Some(x_ms_blob_content_md5) = &this.x_ms_blob_content_md5 {
                             req.insert_header("x-ms-blob-content-md5", x_ms_blob_content_md5);
@@ -14513,17 +17532,28 @@ pub mod block_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_content_disposition) = &this.x_ms_blob_content_disposition {
-                            req.insert_header("x-ms-blob-content-disposition", x_ms_blob_content_disposition);
+                        if let Some(x_ms_blob_content_disposition) =
+                            &this.x_ms_blob_content_disposition
+                        {
+                            req.insert_header(
+                                "x-ms-blob-content-disposition",
+                                x_ms_blob_content_disposition,
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -14535,7 +17565,10 @@ pub mod block_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -14552,14 +17585,21 @@ pub mod block_blob {
                         if let Some(x_ms_tags) = &this.x_ms_tags {
                             req.insert_header("x-ms-tags", x_ms_tags);
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         if let Some(x_ms_legal_hold) = &this.x_ms_legal_hold {
                             req.insert_header("x-ms-legal-hold", x_ms_legal_hold.to_string());
@@ -14571,7 +17611,10 @@ pub mod block_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?BlockBlob", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?BlockBlob",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -14591,7 +17634,7 @@ pub mod block_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -14609,51 +17652,74 @@ pub mod block_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "If the blob has an MD5 hash and this operation is to read the full blob, this response header is returned so that the client can check for message content integrity."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -14725,27 +17791,42 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's content type. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_type(mut self, x_ms_blob_content_type: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_type(
+                mut self,
+                x_ms_blob_content_type: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_type = Some(x_ms_blob_content_type.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content encoding. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_encoding(mut self, x_ms_blob_content_encoding: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_encoding(
+                mut self,
+                x_ms_blob_content_encoding: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_encoding = Some(x_ms_blob_content_encoding.into());
                 self
             }
             #[doc = "Optional. Set the blob's content language. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_language(mut self, x_ms_blob_content_language: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_language(
+                mut self,
+                x_ms_blob_content_language: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_language = Some(x_ms_blob_content_language.into());
                 self
             }
             #[doc = "Optional. An MD5 hash of the blob content. Note that this hash is not validated, as the hashes for the individual blocks were validated when each was uploaded."]
-            pub fn x_ms_blob_content_md5(mut self, x_ms_blob_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_md5(
+                mut self,
+                x_ms_blob_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_md5 = Some(x_ms_blob_content_md5.into());
                 self
             }
             #[doc = "Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_cache_control(mut self, x_ms_blob_cache_control: impl Into<String>) -> Self {
+            pub fn x_ms_blob_cache_control(
+                mut self,
+                x_ms_blob_cache_control: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_cache_control = Some(x_ms_blob_cache_control.into());
                 self
             }
@@ -14760,7 +17841,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's Content-Disposition header."]
-            pub fn x_ms_blob_content_disposition(mut self, x_ms_blob_content_disposition: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_disposition(
+                mut self,
+                x_ms_blob_content_disposition: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_disposition = Some(x_ms_blob_content_disposition.into());
                 self
             }
@@ -14770,17 +17854,26 @@ pub mod block_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -14790,12 +17883,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -14815,12 +17914,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn x_ms_source_if_modified_since(mut self, x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_modified_since(
+                mut self,
+                x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_modified_since = Some(x_ms_source_if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn x_ms_source_if_unmodified_since(mut self, x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_unmodified_since(
+                mut self,
+                x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_unmodified_since = Some(x_ms_source_if_unmodified_since.into());
                 self
             }
@@ -14830,7 +17935,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify an ETag value to operate only on blobs without a matching value."]
-            pub fn x_ms_source_if_none_match(mut self, x_ms_source_if_none_match: impl Into<String>) -> Self {
+            pub fn x_ms_source_if_none_match(
+                mut self,
+                x_ms_source_if_none_match: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_if_none_match = Some(x_ms_source_if_none_match.into());
                 self
             }
@@ -14840,12 +17948,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Specify the md5 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_md5(mut self, x_ms_source_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_md5(
+                mut self,
+                x_ms_source_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_md5 = Some(x_ms_source_content_md5.into());
                 self
             }
@@ -14855,12 +17969,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional, default is true.  Indicates if properties from the source blob should be copied."]
-            pub fn x_ms_copy_source_blob_properties(mut self, x_ms_copy_source_blob_properties: bool) -> Self {
+            pub fn x_ms_copy_source_blob_properties(
+                mut self,
+                x_ms_copy_source_blob_properties: bool,
+            ) -> Self {
                 self.x_ms_copy_source_blob_properties = Some(x_ms_copy_source_blob_properties);
                 self
             }
             #[doc = "Only Bearer type is supported. Credentials should be a valid OAuth access token to copy source."]
-            pub fn x_ms_copy_source_authorization(mut self, x_ms_copy_source_authorization: impl Into<String>) -> Self {
+            pub fn x_ms_copy_source_authorization(
+                mut self,
+                x_ms_copy_source_authorization: impl Into<String>,
+            ) -> Self {
                 self.x_ms_copy_source_authorization = Some(x_ms_copy_source_authorization.into());
                 self
             }
@@ -14875,11 +17995,16 @@ pub mod block_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         req.insert_header("x-ms-blob-type", &this.x_ms_blob_type);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(content_md5) = &this.content_md5 {
                             req.insert_header("content-md5", content_md5);
@@ -14889,10 +18014,16 @@ pub mod block_blob {
                             req.insert_header("x-ms-blob-content-type", x_ms_blob_content_type);
                         }
                         if let Some(x_ms_blob_content_encoding) = &this.x_ms_blob_content_encoding {
-                            req.insert_header("x-ms-blob-content-encoding", x_ms_blob_content_encoding);
+                            req.insert_header(
+                                "x-ms-blob-content-encoding",
+                                x_ms_blob_content_encoding,
+                            );
                         }
                         if let Some(x_ms_blob_content_language) = &this.x_ms_blob_content_language {
-                            req.insert_header("x-ms-blob-content-language", x_ms_blob_content_language);
+                            req.insert_header(
+                                "x-ms-blob-content-language",
+                                x_ms_blob_content_language,
+                            );
                         }
                         if let Some(x_ms_blob_content_md5) = &this.x_ms_blob_content_md5 {
                             req.insert_header("x-ms-blob-content-md5", x_ms_blob_content_md5);
@@ -14906,17 +18037,28 @@ pub mod block_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_content_disposition) = &this.x_ms_blob_content_disposition {
-                            req.insert_header("x-ms-blob-content-disposition", x_ms_blob_content_disposition);
+                        if let Some(x_ms_blob_content_disposition) =
+                            &this.x_ms_blob_content_disposition
+                        {
+                            req.insert_header(
+                                "x-ms-blob-content-disposition",
+                                x_ms_blob_content_disposition,
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -14928,7 +18070,10 @@ pub mod block_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -14939,17 +18084,30 @@ pub mod block_blob {
                         if let Some(x_ms_if_tags) = &this.x_ms_if_tags {
                             req.insert_header("x-ms-if-tags", x_ms_if_tags);
                         }
-                        if let Some(x_ms_source_if_modified_since) = &this.x_ms_source_if_modified_since {
-                            req.insert_header("x-ms-source-if-modified-since", x_ms_source_if_modified_since.to_string());
+                        if let Some(x_ms_source_if_modified_since) =
+                            &this.x_ms_source_if_modified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-modified-since",
+                                x_ms_source_if_modified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_source_if_unmodified_since) = &this.x_ms_source_if_unmodified_since {
-                            req.insert_header("x-ms-source-if-unmodified-since", x_ms_source_if_unmodified_since.to_string());
+                        if let Some(x_ms_source_if_unmodified_since) =
+                            &this.x_ms_source_if_unmodified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-unmodified-since",
+                                x_ms_source_if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_source_if_match) = &this.x_ms_source_if_match {
                             req.insert_header("x-ms-source-if-match", x_ms_source_if_match);
                         }
                         if let Some(x_ms_source_if_none_match) = &this.x_ms_source_if_none_match {
-                            req.insert_header("x-ms-source-if-none-match", x_ms_source_if_none_match);
+                            req.insert_header(
+                                "x-ms-source-if-none-match",
+                                x_ms_source_if_none_match,
+                            );
                         }
                         if let Some(x_ms_source_if_tags) = &this.x_ms_source_if_tags {
                             req.insert_header("x-ms-source-if-tags", x_ms_source_if_tags);
@@ -14964,11 +18122,21 @@ pub mod block_blob {
                             req.insert_header("x-ms-tags", x_ms_tags);
                         }
                         req.insert_header("x-ms-copy-source", &this.x_ms_copy_source);
-                        if let Some(x_ms_copy_source_blob_properties) = &this.x_ms_copy_source_blob_properties {
-                            req.insert_header("x-ms-copy-source-blob-properties", x_ms_copy_source_blob_properties.to_string());
+                        if let Some(x_ms_copy_source_blob_properties) =
+                            &this.x_ms_copy_source_blob_properties
+                        {
+                            req.insert_header(
+                                "x-ms-copy-source-blob-properties",
+                                x_ms_copy_source_blob_properties.to_string(),
+                            );
                         }
-                        if let Some(x_ms_copy_source_authorization) = &this.x_ms_copy_source_authorization {
-                            req.insert_header("x-ms-copy-source-authorization", x_ms_copy_source_authorization);
+                        if let Some(x_ms_copy_source_authorization) =
+                            &this.x_ms_copy_source_authorization
+                        {
+                            req.insert_header(
+                                "x-ms-copy-source-authorization",
+                                x_ms_copy_source_authorization,
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -14978,7 +18146,10 @@ pub mod block_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?BlockBlob&fromUrl", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?BlockBlob&fromUrl",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -14998,7 +18169,7 @@ pub mod block_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -15016,43 +18187,63 @@ pub mod block_blob {
         impl<'a> Headers<'a> {
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the block. This header is only returned when the block was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -15118,22 +18309,34 @@ pub mod block_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -15148,10 +18351,15 @@ pub mod block_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let blockid = &this.blockid;
-                        req.url_mut().query_pairs_mut().append_pair("blockid", blockid);
+                        req.url_mut()
+                            .query_pairs_mut()
+                            .append_pair("blockid", blockid);
                         req.insert_header("content-length", this.content_length.to_string());
                         if let Some(content_md5) = &this.content_md5 {
                             req.insert_header("content-md5", content_md5);
@@ -15162,7 +18370,9 @@ pub mod block_blob {
                         req.insert_header("content-type", "application/octet-stream");
                         let req_body = azure_core::to_json(&this.body)?;
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -15171,10 +18381,16 @@ pub mod block_blob {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -15189,7 +18405,10 @@ pub mod block_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=block", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=block",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -15209,7 +18428,7 @@ pub mod block_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -15227,43 +18446,63 @@ pub mod block_blob {
         impl<'a> Headers<'a> {
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. The value of this header is computed by the Blob service; it is not necessarily the same value specified in the request headers."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the block. This header is only returned when the block was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -15315,12 +18554,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify the md5 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_md5(mut self, x_ms_source_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_md5(
+                mut self,
+                x_ms_source_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_md5 = Some(x_ms_source_content_md5.into());
                 self
             }
             #[doc = "Specify the crc64 calculated for the range of bytes that must be read from the copy source."]
-            pub fn x_ms_source_content_crc64(mut self, x_ms_source_content_crc64: impl Into<String>) -> Self {
+            pub fn x_ms_source_content_crc64(
+                mut self,
+                x_ms_source_content_crc64: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_content_crc64 = Some(x_ms_source_content_crc64.into());
                 self
             }
@@ -15335,17 +18580,26 @@ pub mod block_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -15355,12 +18609,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn x_ms_source_if_modified_since(mut self, x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_modified_since(
+                mut self,
+                x_ms_source_if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_modified_since = Some(x_ms_source_if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn x_ms_source_if_unmodified_since(mut self, x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn x_ms_source_if_unmodified_since(
+                mut self,
+                x_ms_source_if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.x_ms_source_if_unmodified_since = Some(x_ms_source_if_unmodified_since.into());
                 self
             }
@@ -15370,17 +18630,26 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify an ETag value to operate only on blobs without a matching value."]
-            pub fn x_ms_source_if_none_match(mut self, x_ms_source_if_none_match: impl Into<String>) -> Self {
+            pub fn x_ms_source_if_none_match(
+                mut self,
+                x_ms_source_if_none_match: impl Into<String>,
+            ) -> Self {
                 self.x_ms_source_if_none_match = Some(x_ms_source_if_none_match.into());
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
             #[doc = "Only Bearer type is supported. Credentials should be a valid OAuth access token to copy source."]
-            pub fn x_ms_copy_source_authorization(mut self, x_ms_copy_source_authorization: impl Into<String>) -> Self {
+            pub fn x_ms_copy_source_authorization(
+                mut self,
+                x_ms_copy_source_authorization: impl Into<String>,
+            ) -> Self {
                 self.x_ms_copy_source_authorization = Some(x_ms_copy_source_authorization.into());
                 self
             }
@@ -15395,10 +18664,15 @@ pub mod block_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         let blockid = &this.blockid;
-                        req.url_mut().query_pairs_mut().append_pair("blockid", blockid);
+                        req.url_mut()
+                            .query_pairs_mut()
+                            .append_pair("blockid", blockid);
                         req.insert_header("content-length", this.content_length.to_string());
                         req.insert_header("x-ms-copy-source", &this.x_ms_copy_source);
                         if let Some(x_ms_source_range) = &this.x_ms_source_range {
@@ -15408,19 +18682,30 @@ pub mod block_blob {
                             req.insert_header("x-ms-source-content-md5", x_ms_source_content_md5);
                         }
                         if let Some(x_ms_source_content_crc64) = &this.x_ms_source_content_crc64 {
-                            req.insert_header("x-ms-source-content-crc64", x_ms_source_content_crc64);
+                            req.insert_header(
+                                "x-ms-source-content-crc64",
+                                x_ms_source_content_crc64,
+                            );
                         }
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -15428,23 +18713,41 @@ pub mod block_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_source_if_modified_since) = &this.x_ms_source_if_modified_since {
-                            req.insert_header("x-ms-source-if-modified-since", x_ms_source_if_modified_since.to_string());
+                        if let Some(x_ms_source_if_modified_since) =
+                            &this.x_ms_source_if_modified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-modified-since",
+                                x_ms_source_if_modified_since.to_string(),
+                            );
                         }
-                        if let Some(x_ms_source_if_unmodified_since) = &this.x_ms_source_if_unmodified_since {
-                            req.insert_header("x-ms-source-if-unmodified-since", x_ms_source_if_unmodified_since.to_string());
+                        if let Some(x_ms_source_if_unmodified_since) =
+                            &this.x_ms_source_if_unmodified_since
+                        {
+                            req.insert_header(
+                                "x-ms-source-if-unmodified-since",
+                                x_ms_source_if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(x_ms_source_if_match) = &this.x_ms_source_if_match {
                             req.insert_header("x-ms-source-if-match", x_ms_source_if_match);
                         }
                         if let Some(x_ms_source_if_none_match) = &this.x_ms_source_if_none_match {
-                            req.insert_header("x-ms-source-if-none-match", x_ms_source_if_none_match);
+                            req.insert_header(
+                                "x-ms-source-if-none-match",
+                                x_ms_source_if_none_match,
+                            );
                         }
                         if let Some(x_ms_client_request_id) = &this.x_ms_client_request_id {
                             req.insert_header("x-ms-client-request-id", x_ms_client_request_id);
                         }
-                        if let Some(x_ms_copy_source_authorization) = &this.x_ms_copy_source_authorization {
-                            req.insert_header("x-ms-copy-source-authorization", x_ms_copy_source_authorization);
+                        if let Some(x_ms_copy_source_authorization) =
+                            &this.x_ms_copy_source_authorization
+                        {
+                            req.insert_header(
+                                "x-ms-copy-source-authorization",
+                                x_ms_copy_source_authorization,
+                            );
                         }
                         let req_body = azure_core::EMPTY_BODY;
                         req.set_body(req_body);
@@ -15454,7 +18757,10 @@ pub mod block_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=block&fromURL", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=block&fromURL",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -15479,7 +18785,7 @@ pub mod block_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -15497,37 +18803,55 @@ pub mod block_blob {
         impl<'a> Headers<'a> {
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "The media type of the body of the response. For Get Block List this is 'application/xml'"]
             pub fn content_type(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-type"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "content-type",
+                    ))
             }
             #[doc = "The size of the blob in bytes."]
             pub fn x_ms_blob_content_length(&self) -> azure_core::Result<i64> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-blob-content-length"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-blob-content-length",
+                ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
         }
         #[derive(Clone)]
@@ -15582,7 +18906,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -15597,15 +18924,24 @@ pub mod block_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Get);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(snapshot) = &this.snapshot {
-                            req.url_mut().query_pairs_mut().append_pair("snapshot", snapshot);
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("snapshot", snapshot);
                         }
                         let blocklisttype = &this.blocklisttype;
-                        req.url_mut().query_pairs_mut().append_pair("blocklisttype", blocklisttype);
+                        req.url_mut()
+                            .query_pairs_mut()
+                            .append_pair("blocklisttype", blocklisttype);
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
@@ -15624,7 +18960,10 @@ pub mod block_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=blocklist", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=blocklist",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }
@@ -15656,7 +18995,7 @@ pub mod block_blob {
             pub fn as_raw_response(&self) -> &azure_core::Response {
                 &self.0
             }
-            pub fn headers(&self) -> Headers {
+            pub fn headers(&self) -> Headers<'_> {
                 Headers(self.0.headers())
             }
         }
@@ -15674,55 +19013,81 @@ pub mod block_blob {
         impl<'a> Headers<'a> {
             #[doc = "The ETag contains a value that you can use to perform operations conditionally. If the request version is 2011-08-18 or newer, the ETag value will be in quotes."]
             pub fn e_tag(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("etag"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("etag"))
             }
             #[doc = "Returns the date and time the container was last modified. Any operation that modifies the blob, including an update of the blob's metadata or properties, changes the last-modified time of the blob."]
             pub fn last_modified(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("last-modified"))?)
+                azure_core::date::parse_rfc1123(self.0.get_str(
+                    &azure_core::headers::HeaderName::from_static("last-modified"),
+                )?)
             }
             #[doc = "This header is returned so that the client can check for message content integrity. This header refers to the content of the request, meaning, in this case, the list of blocks, and not the content of the blob itself."]
             pub fn content_md5(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static("content-md5"))
             }
             #[doc = "This header is returned so that the client can check for message content integrity. This header refers to the content of the request, meaning, in this case, the list of blocks, and not the content of the blob itself."]
             pub fn x_ms_content_crc64(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-content-crc64"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-content-crc64",
+                    ))
             }
             #[doc = "If a client request id header is sent in the request, this header will be present in the response with the same value."]
             pub fn x_ms_client_request_id(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-client-request-id"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-client-request-id",
+                    ))
             }
             #[doc = "This header uniquely identifies the request that was made and can be used for troubleshooting the request."]
             pub fn x_ms_request_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-request-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-request-id",
+                    ))
             }
             #[doc = "Indicates the version of the Blob service used to execute the request. This header is returned for requests made against version 2009-09-19 and above."]
             pub fn x_ms_version(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version",
+                    ))
             }
             #[doc = "A DateTime value returned by the service that uniquely identifies the blob. The value of this header indicates the blob version, and may be used in subsequent requests to access this version of the blob."]
             pub fn x_ms_version_id(&self) -> azure_core::Result<&str> {
-                self.0.get_str(&azure_core::headers::HeaderName::from_static("x-ms-version-id"))
+                self.0
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-version-id",
+                    ))
             }
             #[doc = "UTC date/time value generated by the service that indicates the time at which the response was initiated"]
             pub fn date(&self) -> azure_core::Result<::time::OffsetDateTime> {
-                azure_core::date::parse_rfc1123(self.0.get_str(&azure_core::headers::HeaderName::from_static("date"))?)
+                azure_core::date::parse_rfc1123(
+                    self.0
+                        .get_str(&azure_core::headers::HeaderName::from_static("date"))?,
+                )
             }
             #[doc = "The value of this header is set to true if the contents of the request are successfully encrypted using the specified algorithm, and false otherwise."]
             pub fn x_ms_request_server_encrypted(&self) -> azure_core::Result<bool> {
-                self.0
-                    .get_as(&azure_core::headers::HeaderName::from_static("x-ms-request-server-encrypted"))
+                self.0.get_as(&azure_core::headers::HeaderName::from_static(
+                    "x-ms-request-server-encrypted",
+                ))
             }
             #[doc = "The SHA-256 hash of the encryption key used to encrypt the blob. This header is only returned when the blob was encrypted with a customer-provided key."]
             pub fn x_ms_encryption_key_sha256(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-key-sha256"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-key-sha256",
+                    ))
             }
             #[doc = "Returns the name of the encryption scope used to encrypt the blob contents and application metadata.  Note that the absence of this header implies use of the default account encryption scope."]
             pub fn x_ms_encryption_scope(&self) -> azure_core::Result<&str> {
                 self.0
-                    .get_str(&azure_core::headers::HeaderName::from_static("x-ms-encryption-scope"))
+                    .get_str(&azure_core::headers::HeaderName::from_static(
+                        "x-ms-encryption-scope",
+                    ))
             }
         }
         #[derive(Clone)]
@@ -15783,27 +19148,42 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_cache_control(mut self, x_ms_blob_cache_control: impl Into<String>) -> Self {
+            pub fn x_ms_blob_cache_control(
+                mut self,
+                x_ms_blob_cache_control: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_cache_control = Some(x_ms_blob_cache_control.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content type. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_type(mut self, x_ms_blob_content_type: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_type(
+                mut self,
+                x_ms_blob_content_type: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_type = Some(x_ms_blob_content_type.into());
                 self
             }
             #[doc = "Optional. Sets the blob's content encoding. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_encoding(mut self, x_ms_blob_content_encoding: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_encoding(
+                mut self,
+                x_ms_blob_content_encoding: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_encoding = Some(x_ms_blob_content_encoding.into());
                 self
             }
             #[doc = "Optional. Set the blob's content language. If specified, this property is stored with the blob and returned with a read request."]
-            pub fn x_ms_blob_content_language(mut self, x_ms_blob_content_language: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_language(
+                mut self,
+                x_ms_blob_content_language: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_language = Some(x_ms_blob_content_language.into());
                 self
             }
             #[doc = "Optional. An MD5 hash of the blob content. Note that this hash is not validated, as the hashes for the individual blocks were validated when each was uploaded."]
-            pub fn x_ms_blob_content_md5(mut self, x_ms_blob_content_md5: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_md5(
+                mut self,
+                x_ms_blob_content_md5: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_md5 = Some(x_ms_blob_content_md5.into());
                 self
             }
@@ -15828,7 +19208,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Optional. Sets the blob's Content-Disposition header."]
-            pub fn x_ms_blob_content_disposition(mut self, x_ms_blob_content_disposition: impl Into<String>) -> Self {
+            pub fn x_ms_blob_content_disposition(
+                mut self,
+                x_ms_blob_content_disposition: impl Into<String>,
+            ) -> Self {
                 self.x_ms_blob_content_disposition = Some(x_ms_blob_content_disposition.into());
                 self
             }
@@ -15838,17 +19221,26 @@ pub mod block_blob {
                 self
             }
             #[doc = "The SHA-256 hash of the provided encryption key. Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_key_sha256(mut self, x_ms_encryption_key_sha256: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_key_sha256(
+                mut self,
+                x_ms_encryption_key_sha256: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_key_sha256 = Some(x_ms_encryption_key_sha256.into());
                 self
             }
             #[doc = "The algorithm used to produce the encryption key hash. Currently, the only accepted value is \"AES256\". Must be provided if the x-ms-encryption-key header is provided."]
-            pub fn x_ms_encryption_algorithm(mut self, x_ms_encryption_algorithm: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_algorithm(
+                mut self,
+                x_ms_encryption_algorithm: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_algorithm = Some(x_ms_encryption_algorithm.into());
                 self
             }
             #[doc = "Optional. Version 2019-07-07 and later.  Specifies the name of the encryption scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the default account encryption scope.  For more information, see Encryption at Rest for Azure Storage Services."]
-            pub fn x_ms_encryption_scope(mut self, x_ms_encryption_scope: impl Into<String>) -> Self {
+            pub fn x_ms_encryption_scope(
+                mut self,
+                x_ms_encryption_scope: impl Into<String>,
+            ) -> Self {
                 self.x_ms_encryption_scope = Some(x_ms_encryption_scope.into());
                 self
             }
@@ -15858,12 +19250,18 @@ pub mod block_blob {
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has been modified since the specified date/time."]
-            pub fn if_modified_since(mut self, if_modified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_modified_since(
+                mut self,
+                if_modified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_modified_since = Some(if_modified_since.into());
                 self
             }
             #[doc = "Specify this header value to operate only on a blob if it has not been modified since the specified date/time."]
-            pub fn if_unmodified_since(mut self, if_unmodified_since: impl Into<::time::OffsetDateTime>) -> Self {
+            pub fn if_unmodified_since(
+                mut self,
+                if_unmodified_since: impl Into<::time::OffsetDateTime>,
+            ) -> Self {
                 self.if_unmodified_since = Some(if_unmodified_since.into());
                 self
             }
@@ -15883,7 +19281,10 @@ pub mod block_blob {
                 self
             }
             #[doc = "Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the analytics logs when storage analytics logging is enabled."]
-            pub fn x_ms_client_request_id(mut self, x_ms_client_request_id: impl Into<String>) -> Self {
+            pub fn x_ms_client_request_id(
+                mut self,
+                x_ms_client_request_id: impl Into<String>,
+            ) -> Self {
                 self.x_ms_client_request_id = Some(x_ms_client_request_id.into());
                 self
             }
@@ -15897,11 +19298,15 @@ pub mod block_blob {
                 mut self,
                 x_ms_immutability_policy_until_date: impl Into<::time::OffsetDateTime>,
             ) -> Self {
-                self.x_ms_immutability_policy_until_date = Some(x_ms_immutability_policy_until_date.into());
+                self.x_ms_immutability_policy_until_date =
+                    Some(x_ms_immutability_policy_until_date.into());
                 self
             }
             #[doc = "Specifies the immutability policy mode to set on the blob."]
-            pub fn x_ms_immutability_policy_mode(mut self, x_ms_immutability_policy_mode: impl Into<String>) -> Self {
+            pub fn x_ms_immutability_policy_mode(
+                mut self,
+                x_ms_immutability_policy_mode: impl Into<String>,
+            ) -> Self {
                 self.x_ms_immutability_policy_mode = Some(x_ms_immutability_policy_mode.into());
                 self
             }
@@ -15921,10 +19326,15 @@ pub mod block_blob {
                         let url = this.url()?;
                         let mut req = azure_core::Request::new(url, azure_core::Method::Put);
                         let bearer_token = this.client.bearer_token().await?;
-                        req.insert_header(azure_core::headers::AUTHORIZATION, format!("Bearer {}", bearer_token.secret()));
+                        req.insert_header(
+                            azure_core::headers::AUTHORIZATION,
+                            format!("Bearer {}", bearer_token.secret()),
+                        );
                         req.insert_header(azure_core::headers::VERSION, "2021-02-12");
                         if let Some(timeout) = &this.timeout {
-                            req.url_mut().query_pairs_mut().append_pair("timeout", &timeout.to_string());
+                            req.url_mut()
+                                .query_pairs_mut()
+                                .append_pair("timeout", &timeout.to_string());
                         }
                         if let Some(x_ms_blob_cache_control) = &this.x_ms_blob_cache_control {
                             req.insert_header("x-ms-blob-cache-control", x_ms_blob_cache_control);
@@ -15933,10 +19343,16 @@ pub mod block_blob {
                             req.insert_header("x-ms-blob-content-type", x_ms_blob_content_type);
                         }
                         if let Some(x_ms_blob_content_encoding) = &this.x_ms_blob_content_encoding {
-                            req.insert_header("x-ms-blob-content-encoding", x_ms_blob_content_encoding);
+                            req.insert_header(
+                                "x-ms-blob-content-encoding",
+                                x_ms_blob_content_encoding,
+                            );
                         }
                         if let Some(x_ms_blob_content_language) = &this.x_ms_blob_content_language {
-                            req.insert_header("x-ms-blob-content-language", x_ms_blob_content_language);
+                            req.insert_header(
+                                "x-ms-blob-content-language",
+                                x_ms_blob_content_language,
+                            );
                         }
                         if let Some(x_ms_blob_content_md5) = &this.x_ms_blob_content_md5 {
                             req.insert_header("x-ms-blob-content-md5", x_ms_blob_content_md5);
@@ -15953,17 +19369,28 @@ pub mod block_blob {
                         if let Some(x_ms_lease_id) = &this.x_ms_lease_id {
                             req.insert_header("x-ms-lease-id", x_ms_lease_id);
                         }
-                        if let Some(x_ms_blob_content_disposition) = &this.x_ms_blob_content_disposition {
-                            req.insert_header("x-ms-blob-content-disposition", x_ms_blob_content_disposition);
+                        if let Some(x_ms_blob_content_disposition) =
+                            &this.x_ms_blob_content_disposition
+                        {
+                            req.insert_header(
+                                "x-ms-blob-content-disposition",
+                                x_ms_blob_content_disposition,
+                            );
                         }
                         if let Some(x_ms_encryption_key) = &this.x_ms_encryption_key {
                             req.insert_header("x-ms-encryption-key", x_ms_encryption_key);
                         }
                         if let Some(x_ms_encryption_key_sha256) = &this.x_ms_encryption_key_sha256 {
-                            req.insert_header("x-ms-encryption-key-sha256", x_ms_encryption_key_sha256);
+                            req.insert_header(
+                                "x-ms-encryption-key-sha256",
+                                x_ms_encryption_key_sha256,
+                            );
                         }
                         if let Some(x_ms_encryption_algorithm) = &this.x_ms_encryption_algorithm {
-                            req.insert_header("x-ms-encryption-algorithm", x_ms_encryption_algorithm);
+                            req.insert_header(
+                                "x-ms-encryption-algorithm",
+                                x_ms_encryption_algorithm,
+                            );
                         }
                         if let Some(x_ms_encryption_scope) = &this.x_ms_encryption_scope {
                             req.insert_header("x-ms-encryption-scope", x_ms_encryption_scope);
@@ -15975,7 +19402,10 @@ pub mod block_blob {
                             req.insert_header("if-modified-since", if_modified_since.to_string());
                         }
                         if let Some(if_unmodified_since) = &this.if_unmodified_since {
-                            req.insert_header("if-unmodified-since", if_unmodified_since.to_string());
+                            req.insert_header(
+                                "if-unmodified-since",
+                                if_unmodified_since.to_string(),
+                            );
                         }
                         if let Some(if_match) = &this.if_match {
                             req.insert_header("if-match", if_match);
@@ -15994,14 +19424,21 @@ pub mod block_blob {
                         if let Some(x_ms_tags) = &this.x_ms_tags {
                             req.insert_header("x-ms-tags", x_ms_tags);
                         }
-                        if let Some(x_ms_immutability_policy_until_date) = &this.x_ms_immutability_policy_until_date {
+                        if let Some(x_ms_immutability_policy_until_date) =
+                            &this.x_ms_immutability_policy_until_date
+                        {
                             req.insert_header(
                                 "x-ms-immutability-policy-until-date",
                                 x_ms_immutability_policy_until_date.to_string(),
                             );
                         }
-                        if let Some(x_ms_immutability_policy_mode) = &this.x_ms_immutability_policy_mode {
-                            req.insert_header("x-ms-immutability-policy-mode", x_ms_immutability_policy_mode);
+                        if let Some(x_ms_immutability_policy_mode) =
+                            &this.x_ms_immutability_policy_mode
+                        {
+                            req.insert_header(
+                                "x-ms-immutability-policy-mode",
+                                x_ms_immutability_policy_mode,
+                            );
                         }
                         if let Some(x_ms_legal_hold) = &this.x_ms_legal_hold {
                             req.insert_header("x-ms-legal-hold", x_ms_legal_hold.to_string());
@@ -16013,7 +19450,10 @@ pub mod block_blob {
             }
             fn url(&self) -> azure_core::Result<azure_core::Url> {
                 let mut url = self.client.endpoint().clone();
-                url.set_path(&format!("/{}/{}?comp=blocklist", &self.container_name, &self.blob));
+                url.set_path(&format!(
+                    "/{}/{}?comp=blocklist",
+                    &self.container_name, &self.blob
+                ));
                 Ok(url)
             }
         }

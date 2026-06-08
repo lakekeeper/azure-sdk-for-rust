@@ -12,39 +12,19 @@ keywords = ["sdk", "azure", "rest", "iot", "cloud"]
 categories = ["api-bindings"]
 edition = "2021"
 
-[dependencies]
-azure_core = { path = "../core", version = "0.21" }
-async-lock = "3.0"
-oauth2 = { version = "4.0.0", default-features = false }
-url = "2.2"
-futures = "0.3"
-serde = { version = "1.0", features = ["derive"] }
-time = { version = "0.3.10" }
-tracing = "0.1.40"
-async-trait = "0.1"
-openssl = { version = "0.10.46",  optional=true }
-uuid = { version = "1.0",  features = ["v4"] }
-pin-project = "1.0"
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-async-process = "2.0"
-
-[target.'cfg(unix)'.dependencies]
-tz-rs = { version = "0.6", optional = true }
-
-[dev-dependencies]
-reqwest = { version = "0.12", features = ["json"], default-features = false }
-tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-tracing-subscriber = "0.3"
-serde_test = "1"
-azure_security_keyvault = { path = "../security_keyvault", default-features = false }
-serial_test = "3.0"
-clap = { version = "4.4.16", features = ["derive"] }
+[package.metadata.docs.rs]
+features = [
+    "enable_reqwest",
+    "enable_reqwest_rustls",
+    "development",
+    "client_certificate",
+    "azureauth_cli",
+    "old_azure_cli",
+]
 
 [features]
 default = ["development", "enable_reqwest", "old_azure_cli"]
 enable_reqwest = ["azure_core/enable_reqwest"]
-enable_reqwest_rustls = ["azure_core/enable_reqwest_rustls"]
 development = []
 test_e2e = []
 client_certificate = ["openssl"]
@@ -58,15 +38,33 @@ azureauth_cli = []
 # https://github.com/Azure/azure-cli/issues/19700
 old_azure_cli = ["time/local-offset", "tz-rs"]
 
-[package.metadata.docs.rs]
-features = [
-  "enable_reqwest",
-  "enable_reqwest_rustls",
-  "development",
-  "client_certificate",
-  "azureauth_cli",
-  "old_azure_cli",
-]
+[dependencies]
+async-lock = "3.0"
+async-trait = "0.1"
+azure_core = { path = "../core", version = "0.21" }
+futures = "0.3"
+oauth2 = { version = "4.4", default-features = false }
+openssl = { version = "0.10.46", optional = true }
+pin-project = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+time = { version = "0.3.10" }
+tracing = "0.1.40"
+url = "2.2"
+uuid = { version = "1.0", features = ["v4"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+async-process = "2.0"
+
+[target.'cfg(unix)'.dependencies]
+tz-rs = { version = "0.7", optional = true }
+
+[dev-dependencies]
+azure_security_keyvault = { path = "../security_keyvault", default-features = false }
+clap = { version = "4.4.16", features = ["derive"] }
+reqwest = { version = "0.13", features = ["json"], default-features = false }
+serial_test = "3.0"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = "0.3"
 
 [[example]]
 name = "client_certificate_credentials"
