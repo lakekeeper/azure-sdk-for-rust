@@ -13,12 +13,7 @@ categories = ["api-bindings"]
 edition = "2021"
 
 [package.metadata.docs.rs]
-features = [
-  "enable_reqwest",
-  "enable_reqwest_rustls",
-  "hmac_rust",
-  "hmac_openssl",
-]
+features = ["enable_reqwest", "enable_reqwest_rustls", "hmac_rust", "hmac_openssl"]
 
 [features]
 default = ["enable_reqwest", "hmac_rust"]

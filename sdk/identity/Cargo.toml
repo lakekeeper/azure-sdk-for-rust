@@ -14,12 +14,12 @@ edition = "2021"
 
 [package.metadata.docs.rs]
 features = [
-  "enable_reqwest",
-  "enable_reqwest_rustls",
-  "development",
-  "client_certificate",
-  "azureauth_cli",
-  "old_azure_cli",
+    "enable_reqwest",
+    "enable_reqwest_rustls",
+    "development",
+    "client_certificate",
+    "azureauth_cli",
+    "old_azure_cli",
 ]
 
 [features]
