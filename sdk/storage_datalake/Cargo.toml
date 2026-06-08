@@ -13,12 +13,18 @@ categories = ["api-bindings"]
 edition = "2021"
 
 [package.metadata.docs.rs]
-features = ["enable_reqwest", "enable_reqwest_rustls", "hmac_rust", "hmac_openssl"]
+features = [
+  "enable_reqwest",
+  "enable_reqwest_rustls",
+  "hmac_rust",
+  "hmac_openssl",
+]
 
 [features]
 default = ["enable_reqwest", "hmac_rust"]
 test_e2e = []
 enable_reqwest = ["azure_core/enable_reqwest", "azure_storage/enable_reqwest"]
+enable_reqwest_rustls = ["azure_core/enable_reqwest_rustls"]
 hmac_rust = ["azure_core/hmac_rust"]
 hmac_openssl = ["azure_core/hmac_openssl"]
 

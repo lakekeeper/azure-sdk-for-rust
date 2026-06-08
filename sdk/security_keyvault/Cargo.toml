@@ -18,6 +18,7 @@ features = ["enable_reqwest", "enable_reqwest_rustls"]
 [features]
 default = ["enable_reqwest"]
 enable_reqwest = ["azure_core/enable_reqwest"]
+enable_reqwest_rustls = ["azure_core/enable_reqwest_rustls"]
 
 [dependencies]
 async-trait = "0.1"
