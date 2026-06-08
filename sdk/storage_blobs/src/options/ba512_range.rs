@@ -23,12 +23,12 @@ impl BA512Range {
     }
 
     pub fn new(start: u64, end: u64) -> azure_core::Result<Self> {
-        if start % 512 != 0 {
+        if !start.is_multiple_of(512) {
             return Err(Error::with_message(ErrorKind::Other, || {
                 format!("start range not 512-byte aligned: {start}")
             }));
         }
-        if (end + 1) % 512 != 0 {
+        if !(end + 1).is_multiple_of(512) {
             return Err(Error::with_message(ErrorKind::Other, || {
                 format!("end range not 512-byte aligned: {end}")
             }));

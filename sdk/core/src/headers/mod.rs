@@ -157,7 +157,7 @@ fn matching_ignore_ascii_case(a: &str, b: &str) -> bool {
     }
     a.chars()
         .zip(b.chars())
-        .all(|(a_c, b_c)| a_c.to_ascii_lowercase() == b_c.to_ascii_lowercase())
+        .all(|(a_c, b_c)| a_c.eq_ignore_ascii_case(&b_c))
 }
 
 impl Debug for Headers {

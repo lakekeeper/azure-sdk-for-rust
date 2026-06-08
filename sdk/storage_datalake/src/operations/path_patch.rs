@@ -74,15 +74,9 @@ impl PatchPathResponse {
     pub fn try_from(response: HttpResponse) -> azure_core::Result<Self> {
         let (_status_code, headers, _pinned_stream) = response.deconstruct();
 
-        let etag = match etag_from_headers(&headers) {
-            Ok(tag) => Some(tag),
-            _ => None,
-        };
+        let etag = etag_from_headers(&headers).ok();
 
-        let last_modified = match last_modified_from_headers(&headers) {
-            Ok(modified) => Some(modified),
-            _ => None,
-        };
+        let last_modified = last_modified_from_headers(&headers).ok();
 
         Ok(Self {
             common_storage_response_headers: (&headers).try_into()?,

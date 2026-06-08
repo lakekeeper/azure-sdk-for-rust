@@ -12,24 +12,23 @@ readme = "README.md"
 license = "MIT"
 edition = "2021"
 
-[dependencies]
-async-trait = "0.1"
-futures = "0.3"
-time = "0.3"
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-azure_core = { path = "../core", version = "0.21", default-features = false }
-
-[dev-dependencies]
-azure_identity = { path = "../identity", default-features = false }
-async-trait = "0.1"
-tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-tracing-subscriber = "0.3"
+[package.metadata.docs.rs]
+features = ["enable_reqwest", "enable_reqwest_rustls"]
 
 [features]
 default = ["enable_reqwest"]
 enable_reqwest = ["azure_core/enable_reqwest"]
-enable_reqwest_rustls = ["azure_core/enable_reqwest_rustls"]
 
-[package.metadata.docs.rs]
-features = ["enable_reqwest", "enable_reqwest_rustls"]
+[dependencies]
+async-trait = "0.1"
+azure_core = { path = "../core", version = "0.21", default-features = false }
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+time = "0.3"
+
+[dev-dependencies]
+async-trait = "0.1"
+azure_identity = { path = "../identity", default-features = false }
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = "0.3"

@@ -219,7 +219,7 @@ impl Error {
     /// This searches the entire ["source" chain](https://doc.rust-lang.org/std/error/trait.Error.html#method.source)
     /// looking for an `HttpError`.
     pub fn as_http_error(&self) -> Option<&HttpError> {
-        let mut error = self.get_ref()? as &(dyn std::error::Error);
+        let mut error = self.get_ref()? as &dyn std::error::Error;
         loop {
             match error.downcast_ref::<HttpError>() {
                 Some(e) => return Some(e),
