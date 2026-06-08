@@ -62,7 +62,7 @@ tz-rs = { version = "0.7", optional = true }
 [dev-dependencies]
 azure_security_keyvault = { path = "../security_keyvault", default-features = false }
 clap = { version = "4.4.16", features = ["derive"] }
-reqwest = { version = "0.13", features = ["json"], default-features = false }
+reqwest = { version = "0.12", features = ["json"], default-features = false }
 serial_test = "3.0"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 tracing-subscriber = "0.3"
