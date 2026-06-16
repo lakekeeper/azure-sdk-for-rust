@@ -13,7 +13,11 @@ pub struct AccessPolicy {
     #[serde(rename = "Expiry", default, with = "azure_core::date::rfc3339::option")]
     pub expiry: Option<::time::OffsetDateTime>,
     #[doc = "the permissions for the acl policy"]
-    #[serde(rename = "Permission", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Permission",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub permission: Option<String>,
 }
 impl AccessPolicy {
@@ -115,8 +119,14 @@ impl Serialize for ArchiveStatus {
         S: Serializer,
     {
         match self {
-            Self::RehydratePendingToHot => serializer.serialize_unit_variant("ArchiveStatus", 0u32, "rehydrate-pending-to-hot"),
-            Self::RehydratePendingToCool => serializer.serialize_unit_variant("ArchiveStatus", 1u32, "rehydrate-pending-to-cool"),
+            Self::RehydratePendingToHot => {
+                serializer.serialize_unit_variant("ArchiveStatus", 0u32, "rehydrate-pending-to-hot")
+            }
+            Self::RehydratePendingToCool => serializer.serialize_unit_variant(
+                "ArchiveStatus",
+                1u32,
+                "rehydrate-pending-to-cool",
+            ),
             Self::UnknownValue(s) => serializer.serialize_str(s.as_str()),
         }
     }
@@ -203,7 +213,11 @@ pub struct BlobItemInternal {
     pub snapshot: String,
     #[serde(rename = "VersionId", default, skip_serializing_if = "Option::is_none")]
     pub version_id: Option<String>,
-    #[serde(rename = "IsCurrentVersion", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "IsCurrentVersion",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub is_current_version: Option<bool>,
     #[doc = "Properties of a blob"]
     #[serde(rename = "Properties")]
@@ -213,13 +227,26 @@ pub struct BlobItemInternal {
     #[doc = "Blob tags"]
     #[serde(rename = "Tags", default, skip_serializing_if = "Option::is_none")]
     pub tags: Option<BlobTags>,
-    #[serde(rename = "OrMetadata", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "OrMetadata",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub or_metadata: Option<ObjectReplicationMetadata>,
-    #[serde(rename = "HasVersionsOnly", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "HasVersionsOnly",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub has_versions_only: Option<bool>,
 }
 impl BlobItemInternal {
-    pub fn new(name: BlobName, deleted: bool, snapshot: String, properties: BlobPropertiesInternal) -> Self {
+    pub fn new(
+        name: BlobName,
+        deleted: bool,
+        snapshot: String,
+        properties: BlobPropertiesInternal,
+    ) -> Self {
         Self {
             name,
             deleted,
@@ -236,7 +263,11 @@ impl BlobItemInternal {
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct BlobMetadata {
-    #[serde(rename = "@Encrypted", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "@Encrypted",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub encrypted: Option<String>,
 }
 impl BlobMetadata {
@@ -271,28 +302,64 @@ impl BlobPrefix {
 #[doc = "Properties of a blob"]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct BlobPropertiesInternal {
-    #[serde(rename = "Creation-Time", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "Creation-Time",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub creation_time: Option<::time::OffsetDateTime>,
     #[serde(rename = "Last-Modified", with = "azure_core::date::rfc1123")]
     pub last_modified: ::time::OffsetDateTime,
     #[serde(rename = "Etag")]
     pub etag: String,
     #[doc = "Size in bytes"]
-    #[serde(rename = "Content-Length", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Content-Length",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub content_length: Option<i64>,
-    #[serde(rename = "Content-Type", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Content-Type",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub content_type: Option<String>,
-    #[serde(rename = "Content-Encoding", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Content-Encoding",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub content_encoding: Option<String>,
-    #[serde(rename = "Content-Language", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Content-Language",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub content_language: Option<String>,
-    #[serde(rename = "Content-MD5", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Content-MD5",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub content_md5: Option<String>,
-    #[serde(rename = "Content-Disposition", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Content-Disposition",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub content_disposition: Option<String>,
-    #[serde(rename = "Cache-Control", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Cache-Control",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub cache_control: Option<String>,
-    #[serde(rename = "x-ms-blob-sequence-number", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "x-ms-blob-sequence-number",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub x_ms_blob_sequence_number: Option<i64>,
     #[serde(
         rename = "BlobType",
@@ -331,23 +398,59 @@ pub struct BlobPropertiesInternal {
         with = "azure_core::xml::text_content"
     )]
     pub copy_status: Option<CopyStatus>,
-    #[serde(rename = "CopySource", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "CopySource",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub copy_source: Option<String>,
-    #[serde(rename = "CopyProgress", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "CopyProgress",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub copy_progress: Option<String>,
-    #[serde(rename = "CopyCompletionTime", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "CopyCompletionTime",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub copy_completion_time: Option<::time::OffsetDateTime>,
-    #[serde(rename = "CopyStatusDescription", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "CopyStatusDescription",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub copy_status_description: Option<String>,
-    #[serde(rename = "ServerEncrypted", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ServerEncrypted",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub server_encrypted: Option<bool>,
-    #[serde(rename = "IncrementalCopy", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "IncrementalCopy",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub incremental_copy: Option<bool>,
-    #[serde(rename = "DestinationSnapshot", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DestinationSnapshot",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub destination_snapshot: Option<String>,
-    #[serde(rename = "DeletedTime", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "DeletedTime",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub deleted_time: Option<::time::OffsetDateTime>,
-    #[serde(rename = "RemainingRetentionDays", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "RemainingRetentionDays",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub remaining_retention_days: Option<i64>,
     #[serde(
         rename = "AccessTier",
@@ -356,7 +459,11 @@ pub struct BlobPropertiesInternal {
         with = "azure_core::xml::text_content"
     )]
     pub access_tier: Option<AccessTier>,
-    #[serde(rename = "AccessTierInferred", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "AccessTierInferred",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub access_tier_inferred: Option<bool>,
     #[serde(
         rename = "ArchiveStatus",
@@ -365,16 +472,32 @@ pub struct BlobPropertiesInternal {
         with = "azure_core::xml::text_content"
     )]
     pub archive_status: Option<ArchiveStatus>,
-    #[serde(rename = "CustomerProvidedKeySha256", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "CustomerProvidedKeySha256",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub customer_provided_key_sha256: Option<String>,
     #[doc = "The name of the encryption scope under which the blob is encrypted."]
-    #[serde(rename = "EncryptionScope", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "EncryptionScope",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub encryption_scope: Option<String>,
-    #[serde(rename = "AccessTierChangeTime", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "AccessTierChangeTime",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub access_tier_change_time: Option<::time::OffsetDateTime>,
     #[serde(rename = "TagCount", default, skip_serializing_if = "Option::is_none")]
     pub tag_count: Option<i64>,
-    #[serde(rename = "Expiry-Time", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "Expiry-Time",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub expiry_time: Option<::time::OffsetDateTime>,
     #[serde(rename = "Sealed", default, skip_serializing_if = "Option::is_none")]
     pub sealed: Option<bool>,
@@ -386,9 +509,17 @@ pub struct BlobPropertiesInternal {
         with = "azure_core::xml::text_content"
     )]
     pub rehydrate_priority: Option<RehydratePriority>,
-    #[serde(rename = "LastAccessTime", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "LastAccessTime",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub last_access_time: Option<::time::OffsetDateTime>,
-    #[serde(rename = "ImmutabilityPolicyUntilDate", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "ImmutabilityPolicyUntilDate",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub immutability_policy_until_date: Option<::time::OffsetDateTime>,
     #[serde(
         rename = "ImmutabilityPolicyMode",
@@ -509,9 +640,17 @@ impl Block {
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct BlockList {
-    #[serde(rename = "CommittedBlocks", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "CommittedBlocks",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub committed_blocks: Option<block_list::CommittedBlocks>,
-    #[serde(rename = "UncommittedBlocks", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "UncommittedBlocks",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub uncommitted_blocks: Option<block_list::UncommittedBlocks>,
 }
 impl BlockList {
@@ -641,20 +780,48 @@ pub struct ContainerProperties {
         with = "azure_core::xml::text_content"
     )]
     pub public_access: Option<PublicAccessType>,
-    #[serde(rename = "HasImmutabilityPolicy", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "HasImmutabilityPolicy",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub has_immutability_policy: Option<bool>,
-    #[serde(rename = "HasLegalHold", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "HasLegalHold",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub has_legal_hold: Option<bool>,
-    #[serde(rename = "DefaultEncryptionScope", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DefaultEncryptionScope",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub default_encryption_scope: Option<String>,
-    #[serde(rename = "DenyEncryptionScopeOverride", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DenyEncryptionScopeOverride",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub deny_encryption_scope_override: Option<bool>,
-    #[serde(rename = "DeletedTime", default, with = "azure_core::date::rfc1123::option")]
+    #[serde(
+        rename = "DeletedTime",
+        default,
+        with = "azure_core::date::rfc1123::option"
+    )]
     pub deleted_time: Option<::time::OffsetDateTime>,
-    #[serde(rename = "RemainingRetentionDays", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "RemainingRetentionDays",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub remaining_retention_days: Option<i64>,
     #[doc = "Indicates if version level worm is enabled on this container."]
-    #[serde(rename = "ImmutableStorageWithVersioningEnabled", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ImmutableStorageWithVersioningEnabled",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub immutable_storage_with_versioning_enabled: Option<bool>,
 }
 impl ContainerProperties {
@@ -727,19 +894,39 @@ impl CorsRule {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct DelimitedTextConfiguration {
     #[doc = "The string used to separate columns."]
-    #[serde(rename = "ColumnSeparator", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ColumnSeparator",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub column_separator: Option<String>,
     #[doc = "The string used to quote a specific field."]
-    #[serde(rename = "FieldQuote", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "FieldQuote",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub field_quote: Option<String>,
     #[doc = "The string used to separate records."]
-    #[serde(rename = "RecordSeparator", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "RecordSeparator",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub record_separator: Option<String>,
     #[doc = "The string used as an escape character."]
-    #[serde(rename = "EscapeChar", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "EscapeChar",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub escape_char: Option<String>,
     #[doc = "Represents whether the data has headers."]
-    #[serde(rename = "HasHeaders", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "HasHeaders",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub has_headers: Option<bool>,
 }
 impl DelimitedTextConfiguration {
@@ -890,161 +1077,404 @@ impl Serialize for ErrorCode {
         S: Serializer,
     {
         match self {
-            Self::AccountAlreadyExists => serializer.serialize_unit_variant("ErrorCode", 0u32, "AccountAlreadyExists"),
-            Self::AccountBeingCreated => serializer.serialize_unit_variant("ErrorCode", 1u32, "AccountBeingCreated"),
-            Self::AccountIsDisabled => serializer.serialize_unit_variant("ErrorCode", 2u32, "AccountIsDisabled"),
-            Self::AuthenticationFailed => serializer.serialize_unit_variant("ErrorCode", 3u32, "AuthenticationFailed"),
-            Self::AuthorizationFailure => serializer.serialize_unit_variant("ErrorCode", 4u32, "AuthorizationFailure"),
-            Self::ConditionHeadersNotSupported => serializer.serialize_unit_variant("ErrorCode", 5u32, "ConditionHeadersNotSupported"),
-            Self::ConditionNotMet => serializer.serialize_unit_variant("ErrorCode", 6u32, "ConditionNotMet"),
-            Self::EmptyMetadataKey => serializer.serialize_unit_variant("ErrorCode", 7u32, "EmptyMetadataKey"),
-            Self::InsufficientAccountPermissions => serializer.serialize_unit_variant("ErrorCode", 8u32, "InsufficientAccountPermissions"),
-            Self::InternalError => serializer.serialize_unit_variant("ErrorCode", 9u32, "InternalError"),
-            Self::InvalidAuthenticationInfo => serializer.serialize_unit_variant("ErrorCode", 10u32, "InvalidAuthenticationInfo"),
-            Self::InvalidHeaderValue => serializer.serialize_unit_variant("ErrorCode", 11u32, "InvalidHeaderValue"),
-            Self::InvalidHttpVerb => serializer.serialize_unit_variant("ErrorCode", 12u32, "InvalidHttpVerb"),
-            Self::InvalidInput => serializer.serialize_unit_variant("ErrorCode", 13u32, "InvalidInput"),
+            Self::AccountAlreadyExists => {
+                serializer.serialize_unit_variant("ErrorCode", 0u32, "AccountAlreadyExists")
+            }
+            Self::AccountBeingCreated => {
+                serializer.serialize_unit_variant("ErrorCode", 1u32, "AccountBeingCreated")
+            }
+            Self::AccountIsDisabled => {
+                serializer.serialize_unit_variant("ErrorCode", 2u32, "AccountIsDisabled")
+            }
+            Self::AuthenticationFailed => {
+                serializer.serialize_unit_variant("ErrorCode", 3u32, "AuthenticationFailed")
+            }
+            Self::AuthorizationFailure => {
+                serializer.serialize_unit_variant("ErrorCode", 4u32, "AuthorizationFailure")
+            }
+            Self::ConditionHeadersNotSupported => {
+                serializer.serialize_unit_variant("ErrorCode", 5u32, "ConditionHeadersNotSupported")
+            }
+            Self::ConditionNotMet => {
+                serializer.serialize_unit_variant("ErrorCode", 6u32, "ConditionNotMet")
+            }
+            Self::EmptyMetadataKey => {
+                serializer.serialize_unit_variant("ErrorCode", 7u32, "EmptyMetadataKey")
+            }
+            Self::InsufficientAccountPermissions => serializer.serialize_unit_variant(
+                "ErrorCode",
+                8u32,
+                "InsufficientAccountPermissions",
+            ),
+            Self::InternalError => {
+                serializer.serialize_unit_variant("ErrorCode", 9u32, "InternalError")
+            }
+            Self::InvalidAuthenticationInfo => {
+                serializer.serialize_unit_variant("ErrorCode", 10u32, "InvalidAuthenticationInfo")
+            }
+            Self::InvalidHeaderValue => {
+                serializer.serialize_unit_variant("ErrorCode", 11u32, "InvalidHeaderValue")
+            }
+            Self::InvalidHttpVerb => {
+                serializer.serialize_unit_variant("ErrorCode", 12u32, "InvalidHttpVerb")
+            }
+            Self::InvalidInput => {
+                serializer.serialize_unit_variant("ErrorCode", 13u32, "InvalidInput")
+            }
             Self::InvalidMd5 => serializer.serialize_unit_variant("ErrorCode", 14u32, "InvalidMd5"),
-            Self::InvalidMetadata => serializer.serialize_unit_variant("ErrorCode", 15u32, "InvalidMetadata"),
-            Self::InvalidQueryParameterValue => serializer.serialize_unit_variant("ErrorCode", 16u32, "InvalidQueryParameterValue"),
-            Self::InvalidRange => serializer.serialize_unit_variant("ErrorCode", 17u32, "InvalidRange"),
-            Self::InvalidResourceName => serializer.serialize_unit_variant("ErrorCode", 18u32, "InvalidResourceName"),
+            Self::InvalidMetadata => {
+                serializer.serialize_unit_variant("ErrorCode", 15u32, "InvalidMetadata")
+            }
+            Self::InvalidQueryParameterValue => {
+                serializer.serialize_unit_variant("ErrorCode", 16u32, "InvalidQueryParameterValue")
+            }
+            Self::InvalidRange => {
+                serializer.serialize_unit_variant("ErrorCode", 17u32, "InvalidRange")
+            }
+            Self::InvalidResourceName => {
+                serializer.serialize_unit_variant("ErrorCode", 18u32, "InvalidResourceName")
+            }
             Self::InvalidUri => serializer.serialize_unit_variant("ErrorCode", 19u32, "InvalidUri"),
-            Self::InvalidXmlDocument => serializer.serialize_unit_variant("ErrorCode", 20u32, "InvalidXmlDocument"),
-            Self::InvalidXmlNodeValue => serializer.serialize_unit_variant("ErrorCode", 21u32, "InvalidXmlNodeValue"),
-            Self::Md5Mismatch => serializer.serialize_unit_variant("ErrorCode", 22u32, "Md5Mismatch"),
-            Self::MetadataTooLarge => serializer.serialize_unit_variant("ErrorCode", 23u32, "MetadataTooLarge"),
-            Self::MissingContentLengthHeader => serializer.serialize_unit_variant("ErrorCode", 24u32, "MissingContentLengthHeader"),
-            Self::MissingRequiredQueryParameter => serializer.serialize_unit_variant("ErrorCode", 25u32, "MissingRequiredQueryParameter"),
-            Self::MissingRequiredHeader => serializer.serialize_unit_variant("ErrorCode", 26u32, "MissingRequiredHeader"),
-            Self::MissingRequiredXmlNode => serializer.serialize_unit_variant("ErrorCode", 27u32, "MissingRequiredXmlNode"),
-            Self::MultipleConditionHeadersNotSupported => {
-                serializer.serialize_unit_variant("ErrorCode", 28u32, "MultipleConditionHeadersNotSupported")
+            Self::InvalidXmlDocument => {
+                serializer.serialize_unit_variant("ErrorCode", 20u32, "InvalidXmlDocument")
             }
-            Self::OperationTimedOut => serializer.serialize_unit_variant("ErrorCode", 29u32, "OperationTimedOut"),
-            Self::OutOfRangeInput => serializer.serialize_unit_variant("ErrorCode", 30u32, "OutOfRangeInput"),
-            Self::OutOfRangeQueryParameterValue => serializer.serialize_unit_variant("ErrorCode", 31u32, "OutOfRangeQueryParameterValue"),
-            Self::RequestBodyTooLarge => serializer.serialize_unit_variant("ErrorCode", 32u32, "RequestBodyTooLarge"),
-            Self::ResourceTypeMismatch => serializer.serialize_unit_variant("ErrorCode", 33u32, "ResourceTypeMismatch"),
-            Self::RequestUrlFailedToParse => serializer.serialize_unit_variant("ErrorCode", 34u32, "RequestUrlFailedToParse"),
-            Self::ResourceAlreadyExists => serializer.serialize_unit_variant("ErrorCode", 35u32, "ResourceAlreadyExists"),
-            Self::ResourceNotFound => serializer.serialize_unit_variant("ErrorCode", 36u32, "ResourceNotFound"),
+            Self::InvalidXmlNodeValue => {
+                serializer.serialize_unit_variant("ErrorCode", 21u32, "InvalidXmlNodeValue")
+            }
+            Self::Md5Mismatch => {
+                serializer.serialize_unit_variant("ErrorCode", 22u32, "Md5Mismatch")
+            }
+            Self::MetadataTooLarge => {
+                serializer.serialize_unit_variant("ErrorCode", 23u32, "MetadataTooLarge")
+            }
+            Self::MissingContentLengthHeader => {
+                serializer.serialize_unit_variant("ErrorCode", 24u32, "MissingContentLengthHeader")
+            }
+            Self::MissingRequiredQueryParameter => serializer.serialize_unit_variant(
+                "ErrorCode",
+                25u32,
+                "MissingRequiredQueryParameter",
+            ),
+            Self::MissingRequiredHeader => {
+                serializer.serialize_unit_variant("ErrorCode", 26u32, "MissingRequiredHeader")
+            }
+            Self::MissingRequiredXmlNode => {
+                serializer.serialize_unit_variant("ErrorCode", 27u32, "MissingRequiredXmlNode")
+            }
+            Self::MultipleConditionHeadersNotSupported => serializer.serialize_unit_variant(
+                "ErrorCode",
+                28u32,
+                "MultipleConditionHeadersNotSupported",
+            ),
+            Self::OperationTimedOut => {
+                serializer.serialize_unit_variant("ErrorCode", 29u32, "OperationTimedOut")
+            }
+            Self::OutOfRangeInput => {
+                serializer.serialize_unit_variant("ErrorCode", 30u32, "OutOfRangeInput")
+            }
+            Self::OutOfRangeQueryParameterValue => serializer.serialize_unit_variant(
+                "ErrorCode",
+                31u32,
+                "OutOfRangeQueryParameterValue",
+            ),
+            Self::RequestBodyTooLarge => {
+                serializer.serialize_unit_variant("ErrorCode", 32u32, "RequestBodyTooLarge")
+            }
+            Self::ResourceTypeMismatch => {
+                serializer.serialize_unit_variant("ErrorCode", 33u32, "ResourceTypeMismatch")
+            }
+            Self::RequestUrlFailedToParse => {
+                serializer.serialize_unit_variant("ErrorCode", 34u32, "RequestUrlFailedToParse")
+            }
+            Self::ResourceAlreadyExists => {
+                serializer.serialize_unit_variant("ErrorCode", 35u32, "ResourceAlreadyExists")
+            }
+            Self::ResourceNotFound => {
+                serializer.serialize_unit_variant("ErrorCode", 36u32, "ResourceNotFound")
+            }
             Self::ServerBusy => serializer.serialize_unit_variant("ErrorCode", 37u32, "ServerBusy"),
-            Self::UnsupportedHeader => serializer.serialize_unit_variant("ErrorCode", 38u32, "UnsupportedHeader"),
-            Self::UnsupportedXmlNode => serializer.serialize_unit_variant("ErrorCode", 39u32, "UnsupportedXmlNode"),
-            Self::UnsupportedQueryParameter => serializer.serialize_unit_variant("ErrorCode", 40u32, "UnsupportedQueryParameter"),
-            Self::UnsupportedHttpVerb => serializer.serialize_unit_variant("ErrorCode", 41u32, "UnsupportedHttpVerb"),
-            Self::AppendPositionConditionNotMet => serializer.serialize_unit_variant("ErrorCode", 42u32, "AppendPositionConditionNotMet"),
-            Self::BlobAlreadyExists => serializer.serialize_unit_variant("ErrorCode", 43u32, "BlobAlreadyExists"),
-            Self::BlobImmutableDueToPolicy => serializer.serialize_unit_variant("ErrorCode", 44u32, "BlobImmutableDueToPolicy"),
-            Self::BlobNotFound => serializer.serialize_unit_variant("ErrorCode", 45u32, "BlobNotFound"),
-            Self::BlobOverwritten => serializer.serialize_unit_variant("ErrorCode", 46u32, "BlobOverwritten"),
-            Self::BlobTierInadequateForContentLength => {
-                serializer.serialize_unit_variant("ErrorCode", 47u32, "BlobTierInadequateForContentLength")
+            Self::UnsupportedHeader => {
+                serializer.serialize_unit_variant("ErrorCode", 38u32, "UnsupportedHeader")
             }
-            Self::BlobUsesCustomerSpecifiedEncryption => {
-                serializer.serialize_unit_variant("ErrorCode", 48u32, "BlobUsesCustomerSpecifiedEncryption")
+            Self::UnsupportedXmlNode => {
+                serializer.serialize_unit_variant("ErrorCode", 39u32, "UnsupportedXmlNode")
             }
-            Self::BlockCountExceedsLimit => serializer.serialize_unit_variant("ErrorCode", 49u32, "BlockCountExceedsLimit"),
-            Self::BlockListTooLong => serializer.serialize_unit_variant("ErrorCode", 50u32, "BlockListTooLong"),
-            Self::CannotChangeToLowerTier => serializer.serialize_unit_variant("ErrorCode", 51u32, "CannotChangeToLowerTier"),
-            Self::CannotVerifyCopySource => serializer.serialize_unit_variant("ErrorCode", 52u32, "CannotVerifyCopySource"),
-            Self::ContainerAlreadyExists => serializer.serialize_unit_variant("ErrorCode", 53u32, "ContainerAlreadyExists"),
-            Self::ContainerBeingDeleted => serializer.serialize_unit_variant("ErrorCode", 54u32, "ContainerBeingDeleted"),
-            Self::ContainerDisabled => serializer.serialize_unit_variant("ErrorCode", 55u32, "ContainerDisabled"),
-            Self::ContainerNotFound => serializer.serialize_unit_variant("ErrorCode", 56u32, "ContainerNotFound"),
-            Self::ContentLengthLargerThanTierLimit => {
-                serializer.serialize_unit_variant("ErrorCode", 57u32, "ContentLengthLargerThanTierLimit")
+            Self::UnsupportedQueryParameter => {
+                serializer.serialize_unit_variant("ErrorCode", 40u32, "UnsupportedQueryParameter")
             }
-            Self::CopyAcrossAccountsNotSupported => serializer.serialize_unit_variant("ErrorCode", 58u32, "CopyAcrossAccountsNotSupported"),
-            Self::CopyIdMismatch => serializer.serialize_unit_variant("ErrorCode", 59u32, "CopyIdMismatch"),
-            Self::FeatureVersionMismatch => serializer.serialize_unit_variant("ErrorCode", 60u32, "FeatureVersionMismatch"),
-            Self::IncrementalCopyBlobMismatch => serializer.serialize_unit_variant("ErrorCode", 61u32, "IncrementalCopyBlobMismatch"),
-            Self::IncrementalCopyOfEralierVersionSnapshotNotAllowed => {
-                serializer.serialize_unit_variant("ErrorCode", 62u32, "IncrementalCopyOfEralierVersionSnapshotNotAllowed")
+            Self::UnsupportedHttpVerb => {
+                serializer.serialize_unit_variant("ErrorCode", 41u32, "UnsupportedHttpVerb")
             }
-            Self::IncrementalCopySourceMustBeSnapshot => {
-                serializer.serialize_unit_variant("ErrorCode", 63u32, "IncrementalCopySourceMustBeSnapshot")
+            Self::AppendPositionConditionNotMet => serializer.serialize_unit_variant(
+                "ErrorCode",
+                42u32,
+                "AppendPositionConditionNotMet",
+            ),
+            Self::BlobAlreadyExists => {
+                serializer.serialize_unit_variant("ErrorCode", 43u32, "BlobAlreadyExists")
             }
-            Self::InfiniteLeaseDurationRequired => serializer.serialize_unit_variant("ErrorCode", 64u32, "InfiniteLeaseDurationRequired"),
-            Self::InvalidBlobOrBlock => serializer.serialize_unit_variant("ErrorCode", 65u32, "InvalidBlobOrBlock"),
-            Self::InvalidBlobTier => serializer.serialize_unit_variant("ErrorCode", 66u32, "InvalidBlobTier"),
-            Self::InvalidBlobType => serializer.serialize_unit_variant("ErrorCode", 67u32, "InvalidBlobType"),
-            Self::InvalidBlockId => serializer.serialize_unit_variant("ErrorCode", 68u32, "InvalidBlockId"),
-            Self::InvalidBlockList => serializer.serialize_unit_variant("ErrorCode", 69u32, "InvalidBlockList"),
-            Self::InvalidOperation => serializer.serialize_unit_variant("ErrorCode", 70u32, "InvalidOperation"),
-            Self::InvalidPageRange => serializer.serialize_unit_variant("ErrorCode", 71u32, "InvalidPageRange"),
-            Self::InvalidSourceBlobType => serializer.serialize_unit_variant("ErrorCode", 72u32, "InvalidSourceBlobType"),
-            Self::InvalidSourceBlobUrl => serializer.serialize_unit_variant("ErrorCode", 73u32, "InvalidSourceBlobUrl"),
-            Self::InvalidVersionForPageBlobOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 74u32, "InvalidVersionForPageBlobOperation")
+            Self::BlobImmutableDueToPolicy => {
+                serializer.serialize_unit_variant("ErrorCode", 44u32, "BlobImmutableDueToPolicy")
             }
-            Self::LeaseAlreadyPresent => serializer.serialize_unit_variant("ErrorCode", 75u32, "LeaseAlreadyPresent"),
-            Self::LeaseAlreadyBroken => serializer.serialize_unit_variant("ErrorCode", 76u32, "LeaseAlreadyBroken"),
-            Self::LeaseIdMismatchWithBlobOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 77u32, "LeaseIdMismatchWithBlobOperation")
+            Self::BlobNotFound => {
+                serializer.serialize_unit_variant("ErrorCode", 45u32, "BlobNotFound")
             }
-            Self::LeaseIdMismatchWithContainerOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 78u32, "LeaseIdMismatchWithContainerOperation")
+            Self::BlobOverwritten => {
+                serializer.serialize_unit_variant("ErrorCode", 46u32, "BlobOverwritten")
             }
-            Self::LeaseIdMismatchWithLeaseOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 79u32, "LeaseIdMismatchWithLeaseOperation")
+            Self::BlobTierInadequateForContentLength => serializer.serialize_unit_variant(
+                "ErrorCode",
+                47u32,
+                "BlobTierInadequateForContentLength",
+            ),
+            Self::BlobUsesCustomerSpecifiedEncryption => serializer.serialize_unit_variant(
+                "ErrorCode",
+                48u32,
+                "BlobUsesCustomerSpecifiedEncryption",
+            ),
+            Self::BlockCountExceedsLimit => {
+                serializer.serialize_unit_variant("ErrorCode", 49u32, "BlockCountExceedsLimit")
             }
-            Self::LeaseIdMissing => serializer.serialize_unit_variant("ErrorCode", 80u32, "LeaseIdMissing"),
-            Self::LeaseIsBreakingAndCannotBeAcquired => {
-                serializer.serialize_unit_variant("ErrorCode", 81u32, "LeaseIsBreakingAndCannotBeAcquired")
+            Self::BlockListTooLong => {
+                serializer.serialize_unit_variant("ErrorCode", 50u32, "BlockListTooLong")
             }
-            Self::LeaseIsBreakingAndCannotBeChanged => {
-                serializer.serialize_unit_variant("ErrorCode", 82u32, "LeaseIsBreakingAndCannotBeChanged")
+            Self::CannotChangeToLowerTier => {
+                serializer.serialize_unit_variant("ErrorCode", 51u32, "CannotChangeToLowerTier")
             }
-            Self::LeaseIsBrokenAndCannotBeRenewed => {
-                serializer.serialize_unit_variant("ErrorCode", 83u32, "LeaseIsBrokenAndCannotBeRenewed")
+            Self::CannotVerifyCopySource => {
+                serializer.serialize_unit_variant("ErrorCode", 52u32, "CannotVerifyCopySource")
             }
+            Self::ContainerAlreadyExists => {
+                serializer.serialize_unit_variant("ErrorCode", 53u32, "ContainerAlreadyExists")
+            }
+            Self::ContainerBeingDeleted => {
+                serializer.serialize_unit_variant("ErrorCode", 54u32, "ContainerBeingDeleted")
+            }
+            Self::ContainerDisabled => {
+                serializer.serialize_unit_variant("ErrorCode", 55u32, "ContainerDisabled")
+            }
+            Self::ContainerNotFound => {
+                serializer.serialize_unit_variant("ErrorCode", 56u32, "ContainerNotFound")
+            }
+            Self::ContentLengthLargerThanTierLimit => serializer.serialize_unit_variant(
+                "ErrorCode",
+                57u32,
+                "ContentLengthLargerThanTierLimit",
+            ),
+            Self::CopyAcrossAccountsNotSupported => serializer.serialize_unit_variant(
+                "ErrorCode",
+                58u32,
+                "CopyAcrossAccountsNotSupported",
+            ),
+            Self::CopyIdMismatch => {
+                serializer.serialize_unit_variant("ErrorCode", 59u32, "CopyIdMismatch")
+            }
+            Self::FeatureVersionMismatch => {
+                serializer.serialize_unit_variant("ErrorCode", 60u32, "FeatureVersionMismatch")
+            }
+            Self::IncrementalCopyBlobMismatch => {
+                serializer.serialize_unit_variant("ErrorCode", 61u32, "IncrementalCopyBlobMismatch")
+            }
+            Self::IncrementalCopyOfEralierVersionSnapshotNotAllowed => serializer
+                .serialize_unit_variant(
+                    "ErrorCode",
+                    62u32,
+                    "IncrementalCopyOfEralierVersionSnapshotNotAllowed",
+                ),
+            Self::IncrementalCopySourceMustBeSnapshot => serializer.serialize_unit_variant(
+                "ErrorCode",
+                63u32,
+                "IncrementalCopySourceMustBeSnapshot",
+            ),
+            Self::InfiniteLeaseDurationRequired => serializer.serialize_unit_variant(
+                "ErrorCode",
+                64u32,
+                "InfiniteLeaseDurationRequired",
+            ),
+            Self::InvalidBlobOrBlock => {
+                serializer.serialize_unit_variant("ErrorCode", 65u32, "InvalidBlobOrBlock")
+            }
+            Self::InvalidBlobTier => {
+                serializer.serialize_unit_variant("ErrorCode", 66u32, "InvalidBlobTier")
+            }
+            Self::InvalidBlobType => {
+                serializer.serialize_unit_variant("ErrorCode", 67u32, "InvalidBlobType")
+            }
+            Self::InvalidBlockId => {
+                serializer.serialize_unit_variant("ErrorCode", 68u32, "InvalidBlockId")
+            }
+            Self::InvalidBlockList => {
+                serializer.serialize_unit_variant("ErrorCode", 69u32, "InvalidBlockList")
+            }
+            Self::InvalidOperation => {
+                serializer.serialize_unit_variant("ErrorCode", 70u32, "InvalidOperation")
+            }
+            Self::InvalidPageRange => {
+                serializer.serialize_unit_variant("ErrorCode", 71u32, "InvalidPageRange")
+            }
+            Self::InvalidSourceBlobType => {
+                serializer.serialize_unit_variant("ErrorCode", 72u32, "InvalidSourceBlobType")
+            }
+            Self::InvalidSourceBlobUrl => {
+                serializer.serialize_unit_variant("ErrorCode", 73u32, "InvalidSourceBlobUrl")
+            }
+            Self::InvalidVersionForPageBlobOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                74u32,
+                "InvalidVersionForPageBlobOperation",
+            ),
+            Self::LeaseAlreadyPresent => {
+                serializer.serialize_unit_variant("ErrorCode", 75u32, "LeaseAlreadyPresent")
+            }
+            Self::LeaseAlreadyBroken => {
+                serializer.serialize_unit_variant("ErrorCode", 76u32, "LeaseAlreadyBroken")
+            }
+            Self::LeaseIdMismatchWithBlobOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                77u32,
+                "LeaseIdMismatchWithBlobOperation",
+            ),
+            Self::LeaseIdMismatchWithContainerOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                78u32,
+                "LeaseIdMismatchWithContainerOperation",
+            ),
+            Self::LeaseIdMismatchWithLeaseOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                79u32,
+                "LeaseIdMismatchWithLeaseOperation",
+            ),
+            Self::LeaseIdMissing => {
+                serializer.serialize_unit_variant("ErrorCode", 80u32, "LeaseIdMissing")
+            }
+            Self::LeaseIsBreakingAndCannotBeAcquired => serializer.serialize_unit_variant(
+                "ErrorCode",
+                81u32,
+                "LeaseIsBreakingAndCannotBeAcquired",
+            ),
+            Self::LeaseIsBreakingAndCannotBeChanged => serializer.serialize_unit_variant(
+                "ErrorCode",
+                82u32,
+                "LeaseIsBreakingAndCannotBeChanged",
+            ),
+            Self::LeaseIsBrokenAndCannotBeRenewed => serializer.serialize_unit_variant(
+                "ErrorCode",
+                83u32,
+                "LeaseIsBrokenAndCannotBeRenewed",
+            ),
             Self::LeaseLost => serializer.serialize_unit_variant("ErrorCode", 84u32, "LeaseLost"),
-            Self::LeaseNotPresentWithBlobOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 85u32, "LeaseNotPresentWithBlobOperation")
+            Self::LeaseNotPresentWithBlobOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                85u32,
+                "LeaseNotPresentWithBlobOperation",
+            ),
+            Self::LeaseNotPresentWithContainerOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                86u32,
+                "LeaseNotPresentWithContainerOperation",
+            ),
+            Self::LeaseNotPresentWithLeaseOperation => serializer.serialize_unit_variant(
+                "ErrorCode",
+                87u32,
+                "LeaseNotPresentWithLeaseOperation",
+            ),
+            Self::MaxBlobSizeConditionNotMet => {
+                serializer.serialize_unit_variant("ErrorCode", 88u32, "MaxBlobSizeConditionNotMet")
             }
-            Self::LeaseNotPresentWithContainerOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 86u32, "LeaseNotPresentWithContainerOperation")
+            Self::NoAuthenticationInformation => {
+                serializer.serialize_unit_variant("ErrorCode", 89u32, "NoAuthenticationInformation")
             }
-            Self::LeaseNotPresentWithLeaseOperation => {
-                serializer.serialize_unit_variant("ErrorCode", 87u32, "LeaseNotPresentWithLeaseOperation")
+            Self::NoPendingCopyOperation => {
+                serializer.serialize_unit_variant("ErrorCode", 90u32, "NoPendingCopyOperation")
             }
-            Self::MaxBlobSizeConditionNotMet => serializer.serialize_unit_variant("ErrorCode", 88u32, "MaxBlobSizeConditionNotMet"),
-            Self::NoAuthenticationInformation => serializer.serialize_unit_variant("ErrorCode", 89u32, "NoAuthenticationInformation"),
-            Self::NoPendingCopyOperation => serializer.serialize_unit_variant("ErrorCode", 90u32, "NoPendingCopyOperation"),
-            Self::OperationNotAllowedOnIncrementalCopyBlob => {
-                serializer.serialize_unit_variant("ErrorCode", 91u32, "OperationNotAllowedOnIncrementalCopyBlob")
+            Self::OperationNotAllowedOnIncrementalCopyBlob => serializer.serialize_unit_variant(
+                "ErrorCode",
+                91u32,
+                "OperationNotAllowedOnIncrementalCopyBlob",
+            ),
+            Self::PendingCopyOperation => {
+                serializer.serialize_unit_variant("ErrorCode", 92u32, "PendingCopyOperation")
             }
-            Self::PendingCopyOperation => serializer.serialize_unit_variant("ErrorCode", 92u32, "PendingCopyOperation"),
-            Self::PreviousSnapshotCannotBeNewer => serializer.serialize_unit_variant("ErrorCode", 93u32, "PreviousSnapshotCannotBeNewer"),
-            Self::PreviousSnapshotNotFound => serializer.serialize_unit_variant("ErrorCode", 94u32, "PreviousSnapshotNotFound"),
-            Self::PreviousSnapshotOperationNotSupported => {
-                serializer.serialize_unit_variant("ErrorCode", 95u32, "PreviousSnapshotOperationNotSupported")
+            Self::PreviousSnapshotCannotBeNewer => serializer.serialize_unit_variant(
+                "ErrorCode",
+                93u32,
+                "PreviousSnapshotCannotBeNewer",
+            ),
+            Self::PreviousSnapshotNotFound => {
+                serializer.serialize_unit_variant("ErrorCode", 94u32, "PreviousSnapshotNotFound")
             }
-            Self::SequenceNumberConditionNotMet => serializer.serialize_unit_variant("ErrorCode", 96u32, "SequenceNumberConditionNotMet"),
-            Self::SequenceNumberIncrementTooLarge => {
-                serializer.serialize_unit_variant("ErrorCode", 97u32, "SequenceNumberIncrementTooLarge")
+            Self::PreviousSnapshotOperationNotSupported => serializer.serialize_unit_variant(
+                "ErrorCode",
+                95u32,
+                "PreviousSnapshotOperationNotSupported",
+            ),
+            Self::SequenceNumberConditionNotMet => serializer.serialize_unit_variant(
+                "ErrorCode",
+                96u32,
+                "SequenceNumberConditionNotMet",
+            ),
+            Self::SequenceNumberIncrementTooLarge => serializer.serialize_unit_variant(
+                "ErrorCode",
+                97u32,
+                "SequenceNumberIncrementTooLarge",
+            ),
+            Self::SnapshotCountExceeded => {
+                serializer.serialize_unit_variant("ErrorCode", 98u32, "SnapshotCountExceeded")
             }
-            Self::SnapshotCountExceeded => serializer.serialize_unit_variant("ErrorCode", 98u32, "SnapshotCountExceeded"),
-            Self::SnapshotOperationRateExceeded => serializer.serialize_unit_variant("ErrorCode", 99u32, "SnapshotOperationRateExceeded"),
-            Self::SnapshotsPresent => serializer.serialize_unit_variant("ErrorCode", 100u32, "SnapshotsPresent"),
-            Self::SourceConditionNotMet => serializer.serialize_unit_variant("ErrorCode", 101u32, "SourceConditionNotMet"),
-            Self::SystemInUse => serializer.serialize_unit_variant("ErrorCode", 102u32, "SystemInUse"),
-            Self::TargetConditionNotMet => serializer.serialize_unit_variant("ErrorCode", 103u32, "TargetConditionNotMet"),
-            Self::UnauthorizedBlobOverwrite => serializer.serialize_unit_variant("ErrorCode", 104u32, "UnauthorizedBlobOverwrite"),
-            Self::BlobBeingRehydrated => serializer.serialize_unit_variant("ErrorCode", 105u32, "BlobBeingRehydrated"),
-            Self::BlobArchived => serializer.serialize_unit_variant("ErrorCode", 106u32, "BlobArchived"),
-            Self::BlobNotArchived => serializer.serialize_unit_variant("ErrorCode", 107u32, "BlobNotArchived"),
-            Self::AuthorizationSourceIpMismatch => serializer.serialize_unit_variant("ErrorCode", 108u32, "AuthorizationSourceIPMismatch"),
-            Self::AuthorizationProtocolMismatch => serializer.serialize_unit_variant("ErrorCode", 109u32, "AuthorizationProtocolMismatch"),
-            Self::AuthorizationPermissionMismatch => {
-                serializer.serialize_unit_variant("ErrorCode", 110u32, "AuthorizationPermissionMismatch")
+            Self::SnapshotOperationRateExceeded => serializer.serialize_unit_variant(
+                "ErrorCode",
+                99u32,
+                "SnapshotOperationRateExceeded",
+            ),
+            Self::SnapshotsPresent => {
+                serializer.serialize_unit_variant("ErrorCode", 100u32, "SnapshotsPresent")
             }
-            Self::AuthorizationServiceMismatch => serializer.serialize_unit_variant("ErrorCode", 111u32, "AuthorizationServiceMismatch"),
-            Self::AuthorizationResourceTypeMismatch => {
-                serializer.serialize_unit_variant("ErrorCode", 112u32, "AuthorizationResourceTypeMismatch")
+            Self::SourceConditionNotMet => {
+                serializer.serialize_unit_variant("ErrorCode", 101u32, "SourceConditionNotMet")
             }
+            Self::SystemInUse => {
+                serializer.serialize_unit_variant("ErrorCode", 102u32, "SystemInUse")
+            }
+            Self::TargetConditionNotMet => {
+                serializer.serialize_unit_variant("ErrorCode", 103u32, "TargetConditionNotMet")
+            }
+            Self::UnauthorizedBlobOverwrite => {
+                serializer.serialize_unit_variant("ErrorCode", 104u32, "UnauthorizedBlobOverwrite")
+            }
+            Self::BlobBeingRehydrated => {
+                serializer.serialize_unit_variant("ErrorCode", 105u32, "BlobBeingRehydrated")
+            }
+            Self::BlobArchived => {
+                serializer.serialize_unit_variant("ErrorCode", 106u32, "BlobArchived")
+            }
+            Self::BlobNotArchived => {
+                serializer.serialize_unit_variant("ErrorCode", 107u32, "BlobNotArchived")
+            }
+            Self::AuthorizationSourceIpMismatch => serializer.serialize_unit_variant(
+                "ErrorCode",
+                108u32,
+                "AuthorizationSourceIPMismatch",
+            ),
+            Self::AuthorizationProtocolMismatch => serializer.serialize_unit_variant(
+                "ErrorCode",
+                109u32,
+                "AuthorizationProtocolMismatch",
+            ),
+            Self::AuthorizationPermissionMismatch => serializer.serialize_unit_variant(
+                "ErrorCode",
+                110u32,
+                "AuthorizationPermissionMismatch",
+            ),
+            Self::AuthorizationServiceMismatch => serializer.serialize_unit_variant(
+                "ErrorCode",
+                111u32,
+                "AuthorizationServiceMismatch",
+            ),
+            Self::AuthorizationResourceTypeMismatch => serializer.serialize_unit_variant(
+                "ErrorCode",
+                112u32,
+                "AuthorizationResourceTypeMismatch",
+            ),
             Self::UnknownValue(s) => serializer.serialize_str(s.as_str()),
         }
     }
@@ -1078,11 +1508,19 @@ pub struct FilterBlobSegment {
     pub where_: String,
     #[serde(rename = "Blobs")]
     pub blobs: filter_blob_segment::Blobs,
-    #[serde(rename = "NextMarker", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "NextMarker",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub next_marker: Option<String>,
 }
 impl FilterBlobSegment {
-    pub fn new(service_endpoint: String, where_: String, blobs: filter_blob_segment::Blobs) -> Self {
+    pub fn new(
+        service_endpoint: String,
+        where_: String,
+        blobs: filter_blob_segment::Blobs,
+    ) -> Self {
         Self {
             service_endpoint,
             where_,
@@ -1111,7 +1549,10 @@ pub struct GeoReplication {
 }
 impl GeoReplication {
     pub fn new(status: geo_replication::Status, last_sync_time: ::time::OffsetDateTime) -> Self {
-        Self { status, last_sync_time }
+        Self {
+            status,
+            last_sync_time,
+        }
     }
 }
 pub mod geo_replication {
@@ -1153,7 +1594,9 @@ pub mod geo_replication {
             match self {
                 Self::Live => serializer.serialize_unit_variant("Status", 0u32, "live"),
                 Self::Bootstrap => serializer.serialize_unit_variant("Status", 1u32, "bootstrap"),
-                Self::Unavailable => serializer.serialize_unit_variant("Status", 2u32, "unavailable"),
+                Self::Unavailable => {
+                    serializer.serialize_unit_variant("Status", 2u32, "unavailable")
+                }
                 Self::UnknownValue(s) => serializer.serialize_str(s.as_str()),
             }
         }
@@ -1163,7 +1606,11 @@ pub mod geo_replication {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct JsonTextConfiguration {
     #[doc = "The string used to separate records."]
-    #[serde(rename = "RecordSeparator", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "RecordSeparator",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub record_separator: Option<String>,
 }
 impl JsonTextConfiguration {
@@ -1224,11 +1671,19 @@ pub struct ListBlobsFlatSegmentResponse {
     pub prefix: Option<String>,
     #[serde(rename = "Marker", default, skip_serializing_if = "Option::is_none")]
     pub marker: Option<String>,
-    #[serde(rename = "MaxResults", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "MaxResults",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub max_results: Option<i64>,
     #[serde(rename = "Blobs", default, skip_serializing_if = "Option::is_none")]
     pub blobs: Option<BlobFlatListSegment>,
-    #[serde(rename = "NextMarker", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "NextMarker",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub next_marker: Option<String>,
 }
 impl azure_core::Continuable for ListBlobsFlatSegmentResponse {
@@ -1261,13 +1716,21 @@ pub struct ListBlobsHierarchySegmentResponse {
     pub prefix: Option<String>,
     #[serde(rename = "Marker", default, skip_serializing_if = "Option::is_none")]
     pub marker: Option<String>,
-    #[serde(rename = "MaxResults", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "MaxResults",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub max_results: Option<i64>,
     #[serde(rename = "Delimiter", default, skip_serializing_if = "Option::is_none")]
     pub delimiter: Option<String>,
     #[serde(rename = "Blobs", default, skip_serializing_if = "Option::is_none")]
     pub blobs: Option<BlobHierarchyListSegment>,
-    #[serde(rename = "NextMarker", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "NextMarker",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub next_marker: Option<String>,
 }
 impl azure_core::Continuable for ListBlobsHierarchySegmentResponse {
@@ -1299,11 +1762,23 @@ pub struct ListContainersSegmentResponse {
     pub prefix: Option<String>,
     #[serde(rename = "Marker", default, skip_serializing_if = "Option::is_none")]
     pub marker: Option<String>,
-    #[serde(rename = "MaxResults", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "MaxResults",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub max_results: Option<i64>,
-    #[serde(rename = "Containers", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "Containers",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub containers: Option<list_containers_segment_response::Containers>,
-    #[serde(rename = "NextMarker", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "NextMarker",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub next_marker: Option<String>,
 }
 impl azure_core::Continuable for ListContainersSegmentResponse {
@@ -1352,7 +1827,13 @@ pub struct Logging {
     pub retention_policy: RetentionPolicy,
 }
 impl Logging {
-    pub fn new(version: String, delete: bool, read: bool, write: bool, retention_policy: RetentionPolicy) -> Self {
+    pub fn new(
+        version: String,
+        delete: bool,
+        read: bool,
+        write: bool,
+        retention_policy: RetentionPolicy,
+    ) -> Self {
         Self {
             version,
             delete,
@@ -1372,10 +1853,18 @@ pub struct Metrics {
     #[serde(rename = "Enabled")]
     pub enabled: bool,
     #[doc = "Indicates whether metrics should generate summary statistics for called API operations."]
-    #[serde(rename = "IncludeAPIs", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "IncludeAPIs",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub include_ap_is: Option<bool>,
     #[doc = "the retention policy which determines how long the associated data should persist"]
-    #[serde(rename = "RetentionPolicy", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "RetentionPolicy",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub retention_policy: Option<RetentionPolicy>,
 }
 impl Metrics {
@@ -1412,7 +1901,11 @@ pub struct PageList {
         skip_serializing_if = "Vec::is_empty"
     )]
     pub clear_range: Vec<ClearRange>,
-    #[serde(rename = "NextMarker", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "NextMarker",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub next_marker: Option<String>,
 }
 impl azure_core::Continuable for PageList {
@@ -1478,7 +1971,9 @@ impl Serialize for PublicAccessType {
         S: Serializer,
     {
         match self {
-            Self::Container => serializer.serialize_unit_variant("PublicAccessType", 0u32, "container"),
+            Self::Container => {
+                serializer.serialize_unit_variant("PublicAccessType", 0u32, "container")
+            }
             Self::Blob => serializer.serialize_unit_variant("PublicAccessType", 1u32, "blob"),
             Self::UnknownValue(s) => serializer.serialize_str(s.as_str()),
         }
@@ -1490,16 +1985,32 @@ pub struct QueryFormat {
     #[serde(rename = "Type", with = "azure_core::xml::text_content")]
     pub type_: QueryType,
     #[doc = "Groups the settings used for interpreting the blob data if the blob is delimited text formatted."]
-    #[serde(rename = "DelimitedTextConfiguration", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DelimitedTextConfiguration",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub delimited_text_configuration: Option<DelimitedTextConfiguration>,
     #[doc = "json text configuration"]
-    #[serde(rename = "JsonTextConfiguration", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "JsonTextConfiguration",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub json_text_configuration: Option<JsonTextConfiguration>,
     #[doc = "Groups the settings used for formatting the response if the response should be Arrow formatted."]
-    #[serde(rename = "ArrowConfiguration", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ArrowConfiguration",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub arrow_configuration: Option<ArrowConfiguration>,
     #[doc = "parquet configuration"]
-    #[serde(rename = "ParquetTextConfiguration", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ParquetTextConfiguration",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub parquet_text_configuration: Option<ParquetConfiguration>,
 }
 impl QueryFormat {
@@ -1522,9 +2033,17 @@ pub struct QueryRequest {
     #[doc = "The query expression in SQL. The maximum size of the query expression is 256KiB."]
     #[serde(rename = "Expression")]
     pub expression: String,
-    #[serde(rename = "InputSerialization", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "InputSerialization",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub input_serialization: Option<QuerySerialization>,
-    #[serde(rename = "OutputSerialization", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "OutputSerialization",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub output_serialization: Option<QuerySerialization>,
 }
 impl QueryRequest {
@@ -1600,7 +2119,9 @@ impl Serialize for RehydratePriority {
     {
         match self {
             Self::High => serializer.serialize_unit_variant("RehydratePriority", 0u32, "High"),
-            Self::Standard => serializer.serialize_unit_variant("RehydratePriority", 1u32, "Standard"),
+            Self::Standard => {
+                serializer.serialize_unit_variant("RehydratePriority", 1u32, "Standard")
+            }
             Self::UnknownValue(s) => serializer.serialize_str(s.as_str()),
         }
     }
@@ -1615,7 +2136,11 @@ pub struct RetentionPolicy {
     #[serde(rename = "Days", default, skip_serializing_if = "Option::is_none")]
     pub days: Option<i64>,
     #[doc = "Indicates whether permanent delete is allowed on this storage account."]
-    #[serde(rename = "AllowPermanentDelete", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "AllowPermanentDelete",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub allow_permanent_delete: Option<bool>,
 }
 impl RetentionPolicy {
@@ -1650,13 +2175,25 @@ pub struct StaticWebsite {
     #[serde(rename = "Enabled")]
     pub enabled: bool,
     #[doc = "The default name of the index page under each directory"]
-    #[serde(rename = "IndexDocument", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "IndexDocument",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub index_document: Option<String>,
     #[doc = "The absolute path of the custom 404 page"]
-    #[serde(rename = "ErrorDocument404Path", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ErrorDocument404Path",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub error_document404_path: Option<String>,
     #[doc = "Absolute path of the default index page"]
-    #[serde(rename = "DefaultIndexDocumentPath", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DefaultIndexDocumentPath",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub default_index_document_path: Option<String>,
 }
 impl StaticWebsite {
@@ -1692,22 +2229,42 @@ pub struct StorageServiceProperties {
     #[serde(rename = "Logging", default, skip_serializing_if = "Option::is_none")]
     pub logging: Option<Logging>,
     #[doc = "a summary of request statistics grouped by API in hour or minute aggregates for blobs"]
-    #[serde(rename = "HourMetrics", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "HourMetrics",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub hour_metrics: Option<Metrics>,
     #[doc = "a summary of request statistics grouped by API in hour or minute aggregates for blobs"]
-    #[serde(rename = "MinuteMetrics", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "MinuteMetrics",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub minute_metrics: Option<Metrics>,
     #[doc = "The set of CORS rules."]
     #[serde(rename = "Cors", default, skip_serializing_if = "Option::is_none")]
     pub cors: Option<storage_service_properties::Cors>,
     #[doc = "The default version to use for requests to the Blob service if an incoming request's version is not specified. Possible values include version 2008-10-27 and all more recent versions"]
-    #[serde(rename = "DefaultServiceVersion", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DefaultServiceVersion",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub default_service_version: Option<String>,
     #[doc = "the retention policy which determines how long the associated data should persist"]
-    #[serde(rename = "DeleteRetentionPolicy", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "DeleteRetentionPolicy",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub delete_retention_policy: Option<RetentionPolicy>,
     #[doc = "The properties that enable an account to host a static website"]
-    #[serde(rename = "StaticWebsite", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "StaticWebsite",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub static_website: Option<StaticWebsite>,
 }
 impl StorageServiceProperties {
@@ -1727,7 +2284,11 @@ pub mod storage_service_properties {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct StorageServiceStats {
     #[doc = "Geo-Replication information for the Secondary Storage Service"]
-    #[serde(rename = "GeoReplication", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "GeoReplication",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub geo_replication: Option<GeoReplication>,
 }
 impl StorageServiceStats {

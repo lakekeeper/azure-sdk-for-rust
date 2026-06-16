@@ -3,7 +3,6 @@ use azure_core::{auth::Secret, date::iso8601, hmac::hmac_sha256};
 use std::fmt;
 use time::OffsetDateTime;
 use url::form_urlencoded;
-use uuid::Uuid;
 
 const SERVICE_SAS_VERSION: &str = "2022-11-02";
 
@@ -94,8 +93,9 @@ impl fmt::Display for BlobSasPermissions {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(rename_all = "PascalCase")]
 pub struct UserDeligationKey {
-    pub signed_oid: Uuid,
-    pub signed_tid: Uuid,
+    // OneLake can return non-UID `signed_oid` and `signed_tid`
+    pub signed_oid: String,
+    pub signed_tid: String,
     #[serde(with = "iso8601")]
     pub signed_start: OffsetDateTime,
     #[serde(with = "iso8601")]
@@ -290,13 +290,13 @@ mod test {
 
         assert_eq!(signed_token, "sv=2022-11-02&sp=r&sr=b&se=1970-01-08T00%3A00%3A00Z&sig=VRZjVZ1c%2FLz7IXCp17Sdx9%2BR9JDrnJdzE3NW56DMjNs%3D");
 
-        let mut parsed = url::form_urlencoded::parse(&signed_token.as_bytes());
+        let mut parsed = form_urlencoded::parse(signed_token.as_bytes());
 
         // BlobSignedResource::Blob
-        assert!(parsed.find(|(k, v)| k == "sr" && v == "b").is_some());
+        assert!(parsed.any(|(k, v)| k == "sr" && v == "b"));
 
         // signed_directory_depth NOT set
-        assert!(parsed.find(|(k, _)| k == "sdd").is_none());
+        assert!(!parsed.any(|(k, _)| k == "sdd"));
         Ok(())
     }
 
@@ -318,13 +318,13 @@ mod test {
 
         assert_eq!(signed_token, "sv=2022-11-02&sp=r&sr=d&se=1970-01-08T00%3A00%3A00Z&sdd=2&sig=zVN%2FRgDWllHZH6%2FqWt5gFrV89vzp4EU6ULDTdYoHils%3D");
 
-        let mut parsed = url::form_urlencoded::parse(&signed_token.as_bytes());
+        let mut parsed = form_urlencoded::parse(signed_token.as_bytes());
 
         // BlobSignedResource::Directory
-        assert!(parsed.find(|(k, v)| k == "sr" && v == "d").is_some());
+        assert!(parsed.any(|(k, v)| k == "sr" && v == "d"));
 
         // signed_directory_depth set
-        assert!(parsed.find(|(k, v)| k == "sdd" && v == "2").is_some());
+        assert!(parsed.any(|(k, v)| k == "sdd" && v == "2"));
         Ok(())
     }
 }

@@ -79,7 +79,7 @@ impl TryFrom<&Headers> for CopyBlobResponse {
             last_modified: last_modified_from_headers(headers)?,
             request_id: request_id_from_headers(headers)?,
             version: version_from_headers(headers)?,
-            server: server_from_headers(headers)?,
+            server: server_from_headers(headers).unwrap_or_default(),
             date: date_from_headers(headers)?,
             copy_id: copy_id_from_headers(headers)?,
             copy_status: copy_status_from_headers(headers)?,

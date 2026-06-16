@@ -37,6 +37,41 @@ pub fn new_replay_transport(transaction_name: String) -> Arc<dyn Policy> {
     Arc::new(MockTransportPlayerPolicy::new(transaction_name))
 }
 
+/// Create a mock transport policy that replays recorded mock requests/responses,
+/// reading responses from files named `<n>_response_<variant>.json`.
+///
+/// This lets a single recorded transaction be replayed against multiple response
+/// variants (e.g. with and without specific headers) without duplicating the
+/// request fixtures.
+pub fn new_replay_transport_with_response_variant(
+    transaction_name: String,
+    response_variant: String,
+) -> Arc<dyn Policy> {
+    Arc::new(MockTransportPlayerPolicy::with_response_variant(
+        transaction_name,
+        response_variant,
+    ))
+}
+
+/// Like [`new_mock_transport`], but in replay mode reads responses from files
+/// named `<n>_response_<variant>.json`. Recording is unaffected.
+pub fn new_mock_transport_with_response_variant(
+    transaction_name: String,
+    response_variant: String,
+) -> Arc<dyn Policy> {
+    if std::env::var(TESTING_MODE_KEY)
+        .as_deref()
+        .unwrap_or(TESTING_MODE_REPLAY)
+        == TESTING_MODE_RECORD
+    {
+        log::warn!("mock testing framework record mode enabled");
+        new_recorder_transport(transaction_name, azure_core::new_http_client())
+    } else {
+        log::info!("mock testing framework replay mode enabled");
+        new_replay_transport_with_response_variant(transaction_name, response_variant)
+    }
+}
+
 /// Create a mock transport policy that records live calls.
 pub fn new_recorder_transport(
     transaction_name: String,

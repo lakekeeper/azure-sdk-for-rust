@@ -75,7 +75,7 @@ impl TryFrom<&Headers> for CopyBlobFromUrlResponse {
             content_md5: content_md5_from_headers_optional(headers)?,
             last_modified: last_modified_from_headers(headers)?,
             etag: etag_from_headers(headers)?,
-            server: server_from_headers(headers)?,
+            server: server_from_headers(headers).unwrap_or_default(),
             request_id: request_id_from_headers(headers)?,
             version: version_from_headers(headers)?,
             copy_id: copy_id_from_headers(headers)?,

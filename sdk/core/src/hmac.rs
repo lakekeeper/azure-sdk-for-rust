@@ -16,7 +16,7 @@ use crate::{
 /// - If it fails to create the HMAC from the `key`.
 #[cfg(all(feature = "hmac_rust", not(feature = "hmac_openssl")))]
 pub fn hmac_sha256(data: &str, key: &Secret) -> crate::Result<String> {
-    use hmac::{Hmac, Mac};
+    use hmac::{Hmac, KeyInit, Mac};
     use sha2::Sha256;
     let key = base64::decode(key.secret())?;
     let mut hmac = Hmac::<Sha256>::new_from_slice(&key)

@@ -51,7 +51,7 @@ impl TryFrom<&Headers> for GetMetadataResponse {
         Ok(GetMetadataResponse {
             request_id: request_id_from_headers(headers)?,
             etag: etag_from_headers(headers)?,
-            server: server_from_headers(headers)?,
+            server: server_from_headers(headers).unwrap_or_default(),
             date: date_from_headers(headers)?,
             metadata: headers.into(),
         })

@@ -284,14 +284,15 @@ mod tests {
         let auth_policy = AuthorizationPolicy::new(storage_credentials);
         let mut request = Request::new(Url::parse("https://example.com").unwrap(), Method::Get);
 
-        let assert_sig_header_unique_mock_policy = Arc::new(AssertSigHeaderUniqueMockPolicy);
+        let assert_sig_header_unique_mock_policy: Arc<dyn Policy> =
+            Arc::new(AssertSigHeaderUniqueMockPolicy);
 
         // apply policy twice
         auth_policy
             .send(
                 &ctx,
                 &mut request,
-                &[assert_sig_header_unique_mock_policy.clone()],
+                std::slice::from_ref(&assert_sig_header_unique_mock_policy),
             )
             .await
             .unwrap();

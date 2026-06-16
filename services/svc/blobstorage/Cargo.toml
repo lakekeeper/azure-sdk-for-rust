@@ -28,7 +28,7 @@ once_cell = "1.18"
 [dev-dependencies]
 azure_identity = { path = "../../../sdk/identity" }
 tokio = { version = "1.23", features = ["macros", "rt-multi-thread"] }
-env_logger = "0.10"
+env_logger = "0.11"
 anyhow = "1.0"
 
 [package.metadata.docs.rs]
@@ -37,7 +37,6 @@ all-features = true
 [features]
 default = ["default_tag", "enable_reqwest"]
 enable_reqwest = ["azure_core/enable_reqwest"]
-enable_reqwest_rustls = ["azure_core/enable_reqwest_rustls"]
 default_tag = ["package-2021-12"]
 "package-2021-12-preview" = []
 "package-2021-12" = []

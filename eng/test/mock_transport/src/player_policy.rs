@@ -10,12 +10,26 @@ use std::sync::Arc;
 #[derive(Debug, Clone)]
 pub struct MockTransportPlayerPolicy {
     transaction: MockTransaction,
+    /// Optional suffix appended to the response filename before `.json`
+    /// (e.g. `Some("with_server")` makes the player read `<n>_response_with_server.json`).
+    response_variant: Option<String>,
 }
 
 impl MockTransportPlayerPolicy {
     pub fn new(transaction_name: String) -> Self {
         let transaction = MockTransaction::new(transaction_name);
-        Self { transaction }
+        Self {
+            transaction,
+            response_variant: None,
+        }
+    }
+
+    pub fn with_response_variant(transaction_name: String, response_variant: String) -> Self {
+        let transaction = MockTransaction::new(transaction_name);
+        Self {
+            transaction,
+            response_variant: Some(response_variant),
+        }
     }
 }
 
@@ -38,7 +52,11 @@ impl Policy for MockTransportPlayerPolicy {
 
             let number = self.transaction.number();
             request_path.push(format!("{number}_request.json"));
-            response_path.push(format!("{number}_response.json"));
+            let response_filename = match &self.response_variant {
+                Some(variant) => format!("{number}_response_{variant}.json"),
+                None => format!("{number}_response.json"),
+            };
+            response_path.push(response_filename);
 
             let request = std::fs::read_to_string(&request_path)?;
             let response = std::fs::read_to_string(&response_path)?;

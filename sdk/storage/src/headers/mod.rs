@@ -21,11 +21,16 @@ impl TryFrom<&Headers> for CommonStorageResponseHeaders {
 
     fn try_from(headers: &Headers) -> azure_core::Result<Self> {
         Ok(Self {
-            request_id: request_id_from_headers(headers)?,
+            // Private endpoints/fabric endpoints do sometimes(?!) not send some(!)
+            // of the headers that were previously required here.
+            // Instead of building a "complicated but more correct" Option-construct
+            // we just silently force missing headers to empty String. Tests show
+            // that this is fine.
+            request_id: request_id_from_headers(headers).unwrap_or_default(),
             client_request_id: client_request_id_from_headers_optional(headers),
-            version: version_from_headers(headers)?,
+            version: version_from_headers(headers).unwrap_or_default(),
             date: date_from_headers(headers)?,
-            server: server_from_headers(headers)?,
+            server: server_from_headers(headers).unwrap_or_default(),
         })
     }
 }

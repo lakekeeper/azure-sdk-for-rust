@@ -116,8 +116,8 @@ mod test {
     #[test]
     fn parse_response() -> azure_core::Result<()> {
         let expected = UserDeligationKey {
-            signed_oid: Uuid::from_u128(0),
-            signed_tid: Uuid::from_u128(1),
+            signed_oid: Uuid::from_u128(0).to_string(),
+            signed_tid: Uuid::from_u128(1).to_string(),
             signed_start: OffsetDateTime::from_unix_timestamp(0).unwrap(),
             signed_expiry: OffsetDateTime::from_unix_timestamp(1).unwrap(),
             signed_service: "b".to_owned(),
